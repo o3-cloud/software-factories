@@ -568,7 +568,53 @@
       </div>
     </div>
 
-    <!-- ── Slide 5: Scaffold ──────────────────────────────── -->
+    <!-- ── Slide 5: Full-Stack Observability ────────────────── -->
+    <div class="slide" data-notes="The typical debugging workflow is: a user reports an error, an engineer finds it in a dashboard, copies the stack trace, opens the codebase, searches for the relevant file, reads surrounding code, forms a hypothesis, makes a fix. That's a multi-tool, multi-context-switch process. When observability is in the agentic loop, the AI collapses that into a single conversation. You give it an error ID, a time range, or a status code spike — and it can query the same signals your team would use, correlate them to source code, and write the fix.">
+      <div class="kicker">Agentic Loop</div>
+      <h2>Observability <em>in the Loop</em></h2>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;max-width:980px;margin-top:0.6rem;align-items:start">
+
+        <div>
+          <p style="font-size:clamp(0.8rem,1.2vw,0.92rem);color:var(--muted);line-height:1.55;margin-bottom:0.85rem">Give the agent <strong style="color:var(--text)">direct access to your observability stack.</strong> It observes the running application, correlates signals to source code, and closes the loop — without leaving the terminal.</p>
+          <ul class="bullets" style="margin-bottom:1rem">
+            <li>Point it at an error, a time window, or a latency spike</li>
+            <li>It queries logs, traces, and metrics to reconstruct what happened</li>
+            <li>Correlates stack traces and spans back to source files</li>
+            <li>Forms a hypothesis and proposes a fix in the same conversation</li>
+          </ul>
+          <div style="font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:0.5rem">The four signals in the loop</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.4rem">
+            <div style="background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.2);border-radius:6px;padding:0.5rem 0.75rem;font-size:0.78rem;color:var(--blue);font-weight:600">Logs<span style="display:block;color:var(--muted);font-size:0.68rem;font-weight:400;margin-top:0.15rem">errors, request traces, audit events</span></div>
+            <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:6px;padding:0.5rem 0.75rem;font-size:0.78rem;color:var(--amber);font-weight:600">Metrics<span style="display:block;color:var(--muted);font-size:0.68rem;font-weight:400;margin-top:0.15rem">latency, error rates, throughput</span></div>
+            <div style="background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.2);border-radius:6px;padding:0.5rem 0.75rem;font-size:0.78rem;color:var(--green);font-weight:600">Traces<span style="display:block;color:var(--muted);font-size:0.68rem;font-weight:400;margin-top:0.15rem">distributed spans, dependency chains</span></div>
+            <div style="background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2);border-radius:6px;padding:0.5rem 0.75rem;font-size:0.78rem;color:#f87171;font-weight:600">Alerts<span style="display:block;color:var(--muted);font-size:0.68rem;font-weight:400;margin-top:0.15rem">thresholds, anomalies, on-call signals</span></div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:0.75rem">
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1rem 1.25rem">
+            <div style="font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:0.5rem">Before — Multi-tool workflow</div>
+            <div style="font-size:0.8rem;line-height:1.7;color:var(--muted)">
+              User reports error → engineer finds it in dashboard → copies stack trace → opens codebase → searches for file → reads code → forms hypothesis → makes fix
+            </div>
+            <div style="margin-top:0.5rem;font-size:0.75rem;color:#f87171">5+ tools &nbsp;·&nbsp; multiple context switches &nbsp;·&nbsp; minutes to hours</div>
+          </div>
+          <div style="background:var(--surface);border:1px solid rgba(52,211,153,0.3);border-radius:10px;padding:1rem 1.25rem">
+            <div style="font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--green);margin-bottom:0.5rem">After — Agentic loop</div>
+            <div style="font-size:0.8rem;line-height:1.7;color:var(--muted)">
+              "Investigate the latency spike at 14:32" → agent queries logs, traces metrics, reads relevant code, proposes fix
+            </div>
+            <div style="margin-top:0.5rem;font-size:0.75rem;color:var(--green)">1 conversation &nbsp;·&nbsp; 0 context switches &nbsp;·&nbsp; seconds to minutes</div>
+          </div>
+          <div class="pull-quote" style="margin:0">
+            <p style="font-size:clamp(0.78rem,1.1vw,0.88rem)">Works with any backend that exposes an API — Datadog, Grafana, Honeycomb, OpenTelemetry collectors, or self-hosted.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── Slide 6: Scaffold ──────────────────────────────── -->
     <div class="slide" data-notes="Think of a scaffold like a factory floor layout. You don't redesign the factory floor every time you manufacture a new product. The scaffold encodes decisions like 'we use PostgreSQL,' 'our APIs follow this contract pattern,' and 'our folder structure looks like this.' This frees the spec to focus purely on what makes this product unique. When specs try to encode both intent and infrastructure, they become bloated, inconsistent, and ambiguous — exactly the kind of input that causes AI code generation to fail.">
       <div class="kicker">Spec Design</div>
       <h2>The Missing <em>Scaffold</em></h2>
@@ -743,6 +789,23 @@
               linkedin.com/in/owenzanzal
             </div>
           </a>
+          <div style="border-top:1px solid var(--border);padding-top:0.75rem;margin-top:0.25rem">
+            <div style="font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:0.6rem">Tools &amp; Docs</div>
+            <a href="https://openobserve.ai/" target="_blank" style="display:flex;align-items:center;gap:0.6rem;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:0.55rem 0.9rem;text-decoration:none;color:var(--text);font-size:0.8rem;font-weight:600;margin-bottom:0.5rem" onmouseover="this.style.borderColor='var(--green)'" onmouseout="this.style.borderColor='var(--border)'">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--green);flex-shrink:0"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+              <div>
+                <div style="font-size:0.67rem;color:var(--muted);margin-bottom:0.1rem">Observability</div>
+                openobserve.ai
+              </div>
+            </a>
+            <a href="https://code.claude.com/docs/en/monitoring-usage" target="_blank" style="display:flex;align-items:center;gap:0.6rem;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:0.55rem 0.9rem;text-decoration:none;color:var(--text);font-size:0.8rem;font-weight:600" onmouseover="this.style.borderColor='var(--amber)'" onmouseout="this.style.borderColor='var(--border)'">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--amber);flex-shrink:0"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <div>
+                <div style="font-size:0.67rem;color:var(--muted);margin-bottom:0.1rem">Claude Code Docs</div>
+                Monitoring Usage
+              </div>
+            </a>
+          </div>
         </div>
 
       </div>
@@ -778,13 +841,14 @@
     'images/1_fXQNfXL66sg_IyP32u1c-w.gif',  // 3  Current State  — abstract
     'images/1_NECF25WLm4whwe-VeJDadw.gif',  // 4  Core Problem   — abstract
     'images/1_LIAAE42h4IZ3ZKsydfS4Ig.gif',  // 5  Paradigm Shift — amber network
-    'images/1_ZFVRe4UaVhquOz5CP0RDIg.gif',  // 6  Architecture   — circuit board
-    'images/1_NYneQk49nCINxYm8jdrZOA.gif',  // 7  Scaffold       — abstract
-    'images/1_Z7NhuVfrLsDLre-32g3Edw.gif',  // 8  Metrics        — abstract
-    'images/1_oduA7mzesH2tqMWCKKz4cg.gif',  // 9  Validation     — crystal/glass
-    'images/1_LIAAE42h4IZ3ZKsydfS4Ig.gif',  // 10 New Roles      — amber network
-    'images/1_AQiVwBSQgmBiS2B_HayCiw.gif',  // 11 Conclusion     — cubes (callback)
-    'images/1_ZFVRe4UaVhquOz5CP0RDIg.gif',  // 12 References     — circuit board
+    'images/1_ZFVRe4UaVhquOz5CP0RDIg.gif',  // 6  Architecture     — circuit board
+    'images/1_NlUNa0yk_BjW5qmiJJjnXg.gif',  // 7  Observability    — light streams
+    'images/1_NYneQk49nCINxYm8jdrZOA.gif',  // 8  Scaffold         — abstract
+    'images/1_Z7NhuVfrLsDLre-32g3Edw.gif',  // 9  Metrics          — abstract
+    'images/1_oduA7mzesH2tqMWCKKz4cg.gif',  // 10 Validation       — crystal/glass
+    'images/1_LIAAE42h4IZ3ZKsydfS4Ig.gif',  // 11 New Roles        — amber network
+    'images/1_AQiVwBSQgmBiS2B_HayCiw.gif',  // 12 Conclusion       — cubes (callback)
+    'images/1_ZFVRe4UaVhquOz5CP0RDIg.gif',  // 13 References       — circuit board
   ];
 
   const slides = Array.from(document.querySelectorAll('.slide'));

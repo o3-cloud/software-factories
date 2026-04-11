@@ -91,7 +91,34 @@ Every process, tool, and ceremony exists to manage that constraint.
 
 ---
 
-## Slide 5: Reimagining the Spec: The Missing "Scaffold"
+## Slide 5: Observability in the Loop
+
+Give the agent direct access to your observability stack. It observes the running application, correlates signals to source code, and closes the loop — without leaving the terminal.
+
+**The four signals in the loop:**
+
+| Signal | What it provides |
+|--------|-----------------|
+| **Logs** | Errors, request traces, audit events |
+| **Metrics** | Latency, error rates, throughput |
+| **Traces** | Distributed spans, dependency chains |
+| **Alerts** | Thresholds, anomalies, on-call signals |
+
+**Before (multi-tool workflow):**
+User reports error → dashboard → copy stack trace → open codebase → search → read code → hypothesis → fix
+*5+ tools · multiple context switches · minutes to hours*
+
+**After (agentic loop):**
+"Investigate the latency spike at 14:32" → agent queries logs, traces metrics, reads relevant code, proposes fix
+*1 conversation · 0 context switches · seconds to minutes*
+
+Works with any backend that exposes an API — Datadog, Grafana, Honeycomb, OpenTelemetry collectors, or self-hosted.
+
+**Notes:** The typical debugging workflow is: a user reports an error, an engineer finds it in a dashboard, copies the stack trace, opens the codebase, searches for the relevant file, reads surrounding code, forms a hypothesis, makes a fix. That's a multi-tool, multi-context-switch process. When observability is in the agentic loop, the AI collapses that into a single conversation. You give it an error ID, a time range, or a status code spike — and it can query the same signals your team would use, correlate them to source code, and write the fix.
+
+---
+
+## Slide 6: Reimagining the Spec: The Missing "Scaffold"
 
 **Most AI systems fail because of garbage specifications, not bad code generation.**
 
@@ -195,6 +222,14 @@ Validation doesn't answer: *who understands the system when it breaks?*
 3. **"How StrongDM's AI team build serious software without even looking at the code"** — Simon Willison
    StrongDM's AI coding agents build production software end-to-end without engineers reviewing the code, validated by comprehensive scenario-based tests and "Digital Twin Universe" clones of external services.
    https://simonwillison.net/2026/Feb/7/software-factory/
+
+4. **"Open Source Observability Platform"** — OpenObserve
+   Open-source platform for ingesting and querying logs, metrics, and traces — a cost-effective alternative to proprietary observability stacks.
+   https://openobserve.ai/
+
+5. **"Claude Code — Monitoring Usage"** — Anthropic
+   How to enable OpenTelemetry for Claude Code to track usage, costs, and tool activity across an organisation by exporting telemetry as metrics, events, and distributed traces.
+   https://code.claude.com/docs/en/monitoring-usage
 
 ---
 
