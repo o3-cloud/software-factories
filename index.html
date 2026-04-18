@@ -1,316 +1,358 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Burning Down the SDLC: The AI Software Factory</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Software Factories — 8-Minute Talk</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:       #0b0f1a;
-      --surface:  #111827;
-      --border:   #1f2d45;
-      --amber:    #f59e0b;
-      --amber-dim:#92650a;
-      --blue:     #38bdf8;
-      --text:     #e2e8f0;
-      --muted:    #64748b;
-      --green:    #34d399;
-      --red:      #f87171;
+      --bg: #0a0a0f;
+      --bg-card: #141420;
+      --text: #f0f0ee;
+      --text-dim: #9ca3af;
+      --accent: #f59e0b;
+      --accent-blue: #60a5fa;
+      --accent-green: #34d399;
+      --border: #2a2a3a;
     }
 
     html, body {
-      width: 100%; height: 100%;
-      background: var(--bg);
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      color: var(--text);
-      overflow: hidden;
-    }
-
-    /* ── Deck Shell ──────────────────────────────────────────── */
-    #deck {
-      width: 100vw; height: 100vh;
-      position: relative;
-      display: flex; flex-direction: column;
-    }
-
-    /* ── Progress bar ────────────────────────────────────────── */
-    #progress {
-      height: 3px;
-      background: var(--border);
-      flex-shrink: 0;
-    }
-    #progress-fill {
       height: 100%;
-      background: linear-gradient(90deg, var(--amber), var(--blue));
-      transition: width 0.4s ease;
+      width: 100%;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
     }
 
-    /* ── Slide area ──────────────────────────────────────────── */
-    #stage {
+    /* ─── Layout ─────────────────────────────────────────── */
+    #app {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    #deck {
       flex: 1;
       position: relative;
       overflow: hidden;
     }
 
+    /* ─── Slides ─────────────────────────────────────────── */
     .slide {
-      position: absolute; inset: 0;
-      display: flex; flex-direction: column;
-      justify-content: center; align-items: flex-start;
-      padding: clamp(2rem, 5vw, 5rem) clamp(2rem, 7vw, 8rem);
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 48px 72px;
       opacity: 0;
       transform: translateX(60px);
-      transition: opacity 0.45s ease, transform 0.45s ease;
+      transition: opacity 0.35s ease, transform 0.35s ease;
       pointer-events: none;
     }
+
     .slide.active {
       opacity: 1;
       transform: translateX(0);
       pointer-events: auto;
     }
-    .slide.exit-left {
+
+    .slide.prev {
       opacity: 0;
       transform: translateX(-60px);
     }
 
-    /* ── Typography ──────────────────────────────────────────── */
-    .kicker {
-      font-size: clamp(0.65rem, 1.2vw, 0.8rem);
-      font-weight: 600;
+    /* ─── Typography ─────────────────────────────────────── */
+    .eyebrow {
+      font-size: 0.7rem;
       letter-spacing: 0.18em;
       text-transform: uppercase;
-      color: var(--amber);
-      margin-bottom: 0.75rem;
-    }
-    h1 {
-      font-size: clamp(2.4rem, 5.5vw, 4.5rem);
-      font-weight: 800;
-      line-height: 1.08;
-      letter-spacing: -0.02em;
-      color: #fff;
-    }
-    h1 em { color: var(--amber); font-style: normal; }
-    h2 {
-      font-size: clamp(1.5rem, 3vw, 2.6rem);
-      font-weight: 700;
-      line-height: 1.2;
-      color: #fff;
-      margin-bottom: 1.25rem;
-    }
-    h2 em { color: var(--amber); font-style: normal; }
-    .subtitle {
-      font-size: clamp(1rem, 2vw, 1.4rem);
-      color: var(--muted);
-      margin-top: 0.75rem;
-      font-weight: 400;
-    }
-    .date-tag {
-      margin-top: 2rem;
-      font-size: 0.8rem;
-      color: var(--muted);
-      letter-spacing: 0.08em;
+      color: var(--accent);
+      margin-bottom: 10px;
     }
 
-    /* ── Bullet lists ────────────────────────────────────────── */
-    ul.bullets {
-      list-style: none;
-      display: flex; flex-direction: column; gap: 0.75rem;
-      max-width: 800px;
+    h2 {
+      font-size: 2.6rem;
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
     }
-    ul.bullets li {
-      font-size: clamp(0.9rem, 1.6vw, 1.15rem);
-      line-height: 1.55;
-      color: var(--text);
-      padding-left: 1.4rem;
+
+    .subtitle {
+      font-size: 0.95rem;
+      color: var(--text-dim);
+      font-style: italic;
+      margin-top: 6px;
+      margin-bottom: 4px;
+    }
+
+    strong { color: var(--text); font-weight: 600; }
+
+    /* ─── Lists ──────────────────────────────────────────── */
+    ul { list-style: none; }
+    ul li {
       position: relative;
+      padding-left: 18px;
+      margin-bottom: 9px;
+      font-size: 1rem;
+      line-height: 1.55;
+      color: var(--text-dim);
     }
-    ul.bullets li::before {
-      content: '';
-      position: absolute; left: 0; top: 0.6em;
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: var(--amber);
+    ul li::before {
+      content: '—';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-weight: 700;
     }
-    ul.bullets li strong { color: #fff; }
-    ul.bullets li.highlight {
-      color: var(--amber);
+
+    /* ─── Col label ──────────────────────────────────────── */
+    .col-label {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--accent);
+      margin-bottom: 10px;
       font-weight: 600;
     }
 
-    /* ── Pull quote ──────────────────────────────────────────── */
-    .pull-quote {
-      border-left: 4px solid var(--amber);
-      padding: 1rem 1.5rem;
-      margin: 1.25rem 0;
-      max-width: 750px;
-      background: rgba(245, 158, 11, 0.06);
-      border-radius: 0 8px 8px 0;
-    }
-    .pull-quote p {
-      font-size: clamp(1rem, 1.8vw, 1.3rem);
-      font-style: italic;
-      color: var(--amber);
-      line-height: 1.5;
+    /* ─── Two-column grid ────────────────────────────────── */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 44px;
+      width: 100%;
     }
 
-    /* ── Factory diagram ─────────────────────────────────────── */
+    /* ─── Quote block ────────────────────────────────────── */
+    .pull-quote {
+      border-left: 3px solid var(--accent);
+      padding: 12px 20px;
+      background: rgba(245,158,11,0.06);
+      border-radius: 0 6px 6px 0;
+      font-style: italic;
+      font-size: 0.95rem;
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* ─── Timing badge ───────────────────────────────────── */
+    .timing {
+      position: absolute;
+      top: 18px;
+      right: 22px;
+      font-size: 0.62rem;
+      color: var(--border);
+      letter-spacing: 0.08em;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ─── Progress + controls ────────────────────────────── */
+    #progress {
+      height: 2px;
+      background: var(--border);
+    }
+    #progress-fill {
+      height: 100%;
+      background: var(--accent);
+      transition: width 0.35s ease;
+    }
+
+    #controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 24px;
+      border-top: 1px solid var(--border);
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      flex-shrink: 0;
+    }
+
+    #controls .left { display: flex; gap: 16px; align-items: center; }
+    #controls .right { display: flex; gap: 16px; align-items: center; }
+
+    #timer { font-variant-numeric: tabular-nums; cursor: pointer; }
+    #timer.warning { color: var(--accent); }
+    #timer.over { color: #ef4444; }
+
+    .hint { color: var(--border); font-size: 0.68rem; }
+
+    /* ─── Notes panel ────────────────────────────────────── */
+    #notes-panel {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      background: #111120;
+      border-top: 1px solid var(--border);
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      flex-shrink: 0;
+    }
+    #notes-panel.open { max-height: 110px; }
+    #notes-inner { padding: 10px 24px; }
+    #notes-inner span {
+      display: block;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       SLIDE-SPECIFIC STYLES
+    ═══════════════════════════════════════════════════════ */
+
+    /* ── Slide 1: Hook ── */
+    #s1 { background: #07070d; }
+    #s1 blockquote {
+      font-size: 1.55rem;
+      line-height: 1.55;
+      font-style: italic;
+      color: var(--text);
+      border-left: 3px solid var(--accent);
+      padding-left: 28px;
+      max-width: 820px;
+      margin-bottom: 28px;
+    }
+    #s1 .hook-bottom {
+      max-width: 820px;
+      width: 100%;
+      display: flex;
+      gap: 32px;
+      align-items: baseline;
+    }
+    #s1 .hook-bottom .boring {
+      font-size: 1.25rem;
+      color: var(--text-dim);
+    }
+    #s1 .hook-bottom .scary {
+      font-size: 1.55rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    /* ── Slide 3: Barbell ── */
+    #s3 .barbell-wrap {
+      width: 100%;
+      max-width: 860px;
+      margin: 20px 0 16px;
+    }
+
+    /* ── Slide 4: Factory ── */
     .factory-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-      max-width: 860px;
-      margin-top: 0.5rem;
+      gap: 12px;
+      width: 100%;
+      max-width: 900px;
+      margin: 18px 0 14px;
     }
-    .factory-card {
-      background: var(--surface);
+    .f-card {
+      background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 1rem 1.25rem;
+      border-radius: 8px;
+      padding: 16px 18px;
     }
-    .factory-card .fc-num {
-      font-size: 0.7rem;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      color: var(--amber);
+    .f-card.critical { border-color: var(--accent); }
+    .f-card .f-num {
+      font-size: 0.62rem;
       text-transform: uppercase;
-      margin-bottom: 0.3rem;
+      letter-spacing: 0.12em;
+      color: var(--text-dim);
+      margin-bottom: 6px;
     }
-    .factory-card .fc-title {
-      font-size: clamp(0.9rem, 1.4vw, 1.05rem);
+    .f-card.critical .f-num { color: var(--accent); }
+    .f-card .f-title {
+      font-size: 1.05rem;
       font-weight: 700;
-      color: #fff;
-      margin-bottom: 0.35rem;
+      margin-bottom: 4px;
     }
-    .factory-card .fc-body {
-      font-size: clamp(0.75rem, 1.1vw, 0.88rem);
-      color: var(--muted);
+    .f-card .f-desc {
+      font-size: 0.82rem;
+      color: var(--text-dim);
       line-height: 1.5;
     }
-    .infra-row {
-      grid-column: 1 / -1;
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 0.5rem;
-    }
-    .infra-chip {
-      background: rgba(56, 189, 248, 0.08);
-      border: 1px solid rgba(56, 189, 248, 0.25);
-      border-radius: 6px;
-      padding: 0.5rem 0.75rem;
-      font-size: clamp(0.72rem, 1vw, 0.82rem);
-      color: var(--blue);
-      font-weight: 600;
-      text-align: center;
-    }
-    .infra-chip span {
-      display: block;
-      font-weight: 400;
-      color: var(--muted);
-      font-size: 0.7rem;
-      margin-top: 0.2rem;
-    }
 
-    /* ── Table ───────────────────────────────────────────────── */
-    table {
-      border-collapse: collapse;
-      max-width: 820px;
+    /* ── Slide 5: Understanding ── */
+    .hc-def {
+      background: var(--bg-card);
+      border-left: 3px solid var(--accent);
+      padding: 16px 22px;
+      border-radius: 0 8px 8px 0;
       width: 100%;
-      font-size: clamp(0.78rem, 1.2vw, 0.95rem);
+      max-width: 880px;
+      margin: 14px 0;
     }
-    th {
-      text-align: left;
-      padding: 0.5rem 1rem;
-      background: var(--surface);
-      color: var(--amber);
-      font-size: 0.72rem;
-      letter-spacing: 0.1em;
+    .hc-def .hc-label {
+      font-size: 0.62rem;
       text-transform: uppercase;
-      border-bottom: 1px solid var(--border);
+      letter-spacing: 0.14em;
+      color: var(--accent);
+      margin-bottom: 6px;
     }
-    td {
-      padding: 0.65rem 1rem;
-      border-bottom: 1px solid rgba(31,45,69,0.6);
-      vertical-align: top;
-      line-height: 1.45;
-      color: var(--text);
+    .hc-def .hc-text {
+      font-size: 1.05rem;
+      line-height: 1.5;
     }
-    td:first-child { color: #fff; font-weight: 600; white-space: nowrap; }
-    tr:last-child td { border-bottom: none; }
-    tr:hover td { background: rgba(245,158,11,0.03); }
+    .hc-def .hc-sub {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      margin-top: 6px;
+      line-height: 1.5;
+    }
+    .shift-arrow {
+      text-align: center;
+      font-size: 1rem;
+      color: var(--text-dim);
+      margin-top: 14px;
+    }
+    .shift-arrow .arrow { color: var(--accent); font-size: 1.3rem; margin: 0 10px; }
+    .shift-arrow .after { color: var(--accent); font-weight: 600; }
 
-    /* ── Scaffold table ──────────────────────────────────────── */
-    .scaffold-table th:first-child { width: 160px; }
-
-    /* ── Metric callout ──────────────────────────────────────── */
-    .metric-row {
-      display: flex; gap: 1.5rem; margin: 1rem 0;
-    }
-    .metric-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 1rem 1.4rem;
-      min-width: 180px;
-    }
-    .metric-card .mc-label {
-      font-size: 0.7rem; letter-spacing: 0.1em;
-      text-transform: uppercase; color: var(--muted);
-      margin-bottom: 0.3rem;
-    }
-    .metric-card .mc-val {
-      font-size: 1.6rem; font-weight: 800;
-    }
-    .mc-bad  .mc-val { color: var(--red); }
-    .mc-good .mc-val { color: var(--green); }
-
-    /* ── Validation layers ───────────────────────────────────── */
-    .layer-stack {
-      display: flex; flex-direction: column; gap: 0.6rem;
-      max-width: 760px; margin: 0.75rem 0;
-    }
-    .layer {
-      display: flex; align-items: center; gap: 1rem;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 0.65rem 1rem;
-    }
-    .layer-num {
-      width: 28px; height: 28px;
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.78rem; font-weight: 700;
-      flex-shrink: 0;
-    }
-    .layer-num.det  { background: rgba(52,211,153,0.15); color: var(--green); }
-    .layer-num.qnt  { background: rgba(56,189,248,0.15); color: var(--blue); }
-    .layer-num.prb  { background: rgba(245,158,11,0.15); color: var(--amber); }
-    .layer-num.acc  { background: rgba(248,113,113,0.15); color: var(--red); }
-    .layer-title { font-weight: 700; color: #fff; font-size: 0.95rem; flex: 0 0 180px; }
-    .layer-desc  { font-size: 0.85rem; color: var(--muted); line-height: 1.4; }
-
-    /* ── Manifesto ───────────────────────────────────────────── */
-    .manifesto {
-      display: grid; grid-template-columns: 1fr 1fr;
-      gap: 0.75rem; max-width: 760px; margin-top: 1rem;
+    /* ── Slide 6: Manifesto ── */
+    #s6 { background: #000; }
+    #s6 .preamble {
+      font-size: 0.88rem;
+      color: #3a3a4a;
+      text-align: center;
+      max-width: 560px;
+      line-height: 1.7;
+      margin-bottom: 36px;
     }
     .manifesto-line {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 1rem 1.25rem;
-      font-size: clamp(0.85rem, 1.4vw, 1rem);
-      font-weight: 600;
-      color: var(--amber);
+      font-size: 2.1rem;
+      font-weight: 700;
+      text-align: center;
       line-height: 1.4;
+      opacity: 0.12;
+      transition: opacity 0.55s ease;
+      cursor: default;
     }
+    .manifesto-line.lit { opacity: 1; }
+    #final-line {
+      font-size: 1.1rem;
+      color: var(--text-dim);
+      text-align: center;
+      margin-top: 36px;
+      line-height: 1.65;
+      opacity: 0;
+      transition: opacity 0.8s ease;
+      max-width: 520px;
+    }
+    #final-line strong { color: var(--accent); }
+    #final-line.lit { opacity: 1; }
 
-    /* ── Title slide accent ──────────────────────────────────── */
+    /* ── Title accent panel ──────────────────────────────────── */
     .title-accent {
       position: absolute; right: 0; top: 0; bottom: 0;
-      width: 35%;
-      background: linear-gradient(135deg, rgba(245,158,11,0.08), rgba(56,189,248,0.05));
+      width: 34%;
+      background: linear-gradient(135deg, rgba(245,158,11,0.07), rgba(96,165,250,0.04));
       border-left: 1px solid rgba(245,158,11,0.1);
       pointer-events: none;
       overflow: hidden;
@@ -319,601 +361,564 @@
       content: '';
       position: absolute; inset: -20%;
       background: repeating-linear-gradient(
-        45deg,
-        transparent,
-        transparent 24px,
-        rgba(245,158,11,0.03) 24px,
-        rgba(245,158,11,0.03) 25px
+        45deg, transparent, transparent 24px,
+        rgba(245,158,11,0.035) 24px, rgba(245,158,11,0.035) 25px
       );
     }
-    .gear-svg {
-      position: absolute; right: 5%; top: 50%;
-      transform: translateY(-50%);
-      opacity: 0.07;
-      width: min(260px, 22vw);
-    }
 
-    /* ── Footer nav ──────────────────────────────────────────── */
-    #footer {
-      flex-shrink: 0;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0.6rem clamp(1.5rem, 4vw, 4rem);
-      border-top: 1px solid var(--border);
-      background: rgba(11,15,26,0.9);
-    }
-    #slide-counter {
-      font-size: 0.75rem; color: var(--muted);
-      letter-spacing: 0.05em;
-    }
-    .nav-btn {
-      background: none;
-      border: 1px solid var(--border);
-      color: var(--muted);
-      font-size: 0.8rem;
-      padding: 0.35rem 0.9rem;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: color 0.2s, border-color 0.2s, background 0.2s;
-    }
-    .nav-btn:hover {
-      color: var(--amber);
-      border-color: var(--amber);
-      background: rgba(245,158,11,0.06);
-    }
-    #note-toggle {
-      font-size: 0.72rem;
-      color: var(--muted);
-      background: none; border: none;
-      cursor: pointer;
-      text-decoration: underline;
-      text-underline-offset: 3px;
-    }
-    #note-toggle:hover { color: var(--blue); }
-
-    /* ── Speaker notes overlay ───────────────────────────────── */
-    #notes-panel {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,0.85);
-      display: flex; align-items: center; justify-content: center;
-      z-index: 100;
-      opacity: 0; pointer-events: none;
-      transition: opacity 0.25s;
-    }
-    #notes-panel.open {
-      opacity: 1; pointer-events: auto;
-    }
-    #notes-box {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 2rem;
-      max-width: 680px; width: 90%;
-      max-height: 70vh; overflow-y: auto;
-    }
-    #notes-box h3 {
-      font-size: 0.7rem; letter-spacing: 0.14em;
-      text-transform: uppercase; color: var(--amber);
-      margin-bottom: 1rem;
-    }
-    #notes-content {
-      font-size: 0.95rem; line-height: 1.7;
-      color: var(--text);
-    }
-    #notes-close {
-      margin-top: 1.5rem;
-      display: block;
-      background: none;
-      border: 1px solid var(--border);
-      color: var(--muted);
-      padding: 0.4rem 1rem;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 0.82rem;
-    }
-    #notes-close:hover { color: var(--text); border-color: var(--text); }
-
-    /* ── Slide backgrounds ───────────────────────────────────── */
-    .slide { isolation: isolate; }
+    /* ── Background GIF layer ────────────────────────────────── */
     .slide-bg {
       position: absolute; inset: 0;
       background-size: cover;
       background-position: center;
-      opacity: 0.13;
+      opacity: 0.09;
       pointer-events: none;
       z-index: -1;
     }
 
-    /* ── Responsive tweaks ───────────────────────────────────── */
-    @media (max-width: 700px) {
-      .factory-grid { grid-template-columns: 1fr; }
-      .infra-row { grid-template-columns: 1fr 1fr; }
-      .metric-row { flex-wrap: wrap; }
-      .manifesto { grid-template-columns: 1fr; }
+    /* ── Title h1 ────────────────────────────────────────────── */
+    #s-title h1 {
+      font-size: clamp(2.8rem, 6vw, 5rem);
+      font-weight: 800;
+      line-height: 1.08;
+      letter-spacing: -0.025em;
+      color: #fff;
+      margin: 10px 0 14px;
+    }
+
+    /* ── References cards ────────────────────────────────────── */
+    .ref-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 18px;
+    }
+    .ref-card .ref-num {
+      font-size: 0.62rem;
+      text-transform: uppercase;
+      letter-spacing: 0.13em;
+      color: var(--accent);
+      margin-bottom: 5px;
+    }
+    .ref-card .ref-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+    .ref-card .ref-body {
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      line-height: 1.5;
+      margin-bottom: 7px;
+    }
+    .ref-card a {
+      font-size: 0.75rem;
+      color: var(--accent-blue);
+      text-decoration: none;
+    }
+    .author-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .author-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 9px 12px;
+      text-decoration: none;
+      color: var(--text);
+      font-size: 0.82rem;
+      font-weight: 600;
+      transition: border-color 0.2s;
+    }
+    .author-link:hover { border-color: var(--accent); }
+    .author-link .al-label {
+      font-size: 0.65rem;
+      color: var(--text-dim);
+      margin-bottom: 1px;
     }
   </style>
 </head>
 <body>
+<div id="app">
+  <div id="deck">
 
-<div id="deck">
+    <!-- ════════════════════════════════
+         SLIDE 0 — Title
+    ════════════════════════════════ -->
+    <div class="slide active" id="s-title"
+         data-notes="No preamble needed — the title does the work. Let the room read it. Start talking when they look back up.">
+      <div class="slide-bg" style="background-image:url('images/1_AQiVwBSQgmBiS2B_HayCiw.gif')"></div>
+      <div class="title-accent"></div>
+      <div class="eyebrow">Presentation &nbsp;·&nbsp; April 2026</div>
+      <h1>Burning Down<br/>the <span style="color:var(--accent);">SDLC</span></h1>
+      <p style="font-size:clamp(1rem,2vw,1.35rem); color:var(--text-dim); line-height:1.55; margin-bottom:14px;">
+        The AI Software Factory<br/>
+        <span style="font-size:0.9em;">Machine-Generated Code and the New Engineering Paradigm</span>
+      </p>
+      <p style="font-size:0.78rem; color:var(--border); letter-spacing:0.08em;">
+        <span style="color:var(--accent); font-weight:700;">SDLC</span> &nbsp;·&nbsp; Software Delivery Life Cycle &nbsp;·&nbsp; 2026-04-11
+      </p>
+    </div>
+
+    <!-- ════════════════════════════════
+         SLIDE 1 — Opening Hook
+    ════════════════════════════════ -->
+    <div class="slide" id="s1"
+         data-notes="No bio slide — start talking immediately. Pause after the quote. Let it land before moving on. The last two lines should feel like a gut-punch."
+         data-timing="0:00 – 0:30">
+      <div class="timing">0:00 – 0:30</div>
+      <div style="max-width:820px; width:100%;">
+        <div class="eyebrow">AI Software Factories</div>
+        <blockquote>
+          "AI didn't introduce new problems to software development. The problems have always been here — ambiguous specs, late defect discovery, review bottlenecks, code no one really understands."
+        </blockquote>
+        <div class="hook-bottom">
+          <span class="boring">At human coding speed, those were <em>annoying</em>.</span>
+        </div>
+        <div style="margin-top:10px;">
+          <span style="font-size:1.55rem; font-weight:700;">At AI speed, they are <span style="color:var(--accent);">existential.</span></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════
+         SLIDE 2 — The SDLC Is Cracking
+    ════════════════════════════════ -->
+    <div class="slide" id="s2"
+         data-notes="Evidence first — make the problem visceral before diagnosing it. The open-source PR refusal is real and recognizable. Pause before 'Going back is not a strategy.' Rhetorical beat."
+         data-timing="0:30 – 2:00">
+      <div class="timing">0:30 – 2:00</div>
+      <div style="max-width:940px; width:100%;">
+        <h2>The SDLC Is Cracking</h2>
+        <p class="subtitle">Evidence first, then diagnosis.</p>
+
+        <div class="two-col" style="margin-top:24px;">
+          <div>
+            <div class="col-label">What's happening</div>
+            <ul>
+              <li>Open source maintainers are <strong>refusing AI-generated PRs</strong> — review volume has outpaced human bandwidth</li>
+              <li>Engineering orgs shipping code <strong>no one fully understands</strong> — reaching production</li>
+              <li>AWS production failures traced to <strong>poorly understood generated code</strong></li>
+            </ul>
+          </div>
+          <div>
+            <div class="col-label">The diagnosis</div>
+            <ul>
+              <li>AI is <strong>not introducing</strong> new problems</li>
+              <li>AI is a <strong>multiplier</strong> — it takes every latent dysfunction in your SDLC and turns the dial to 11</li>
+              <li>Going back is <strong>not a strategy</strong></li>
+            </ul>
+            <div style="margin-top:16px;" class="pull-quote">
+              The question is: <strong>what does the SDLC need to become?</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════
+         SLIDE 3 — The Barbell Effect
+    ════════════════════════════════ -->
+    <div class="slide" id="s3"
+         data-notes="Let the barbell diagram do the work — point to each section. Emphasize 'most teams are not staffed or tooled for that.' The closing quote is the one-liner they'll screenshot."
+         data-timing="2:00 – 3:30">
+      <div class="timing">2:00 – 3:30</div>
+      <div style="max-width:940px; width:100%;">
+        <h2>The Barbell Effect</h2>
+        <p class="subtitle">The structural rebalance no one planned for.</p>
+
+        <!-- Barbell SVG -->
+        <div class="barbell-wrap">
+          <svg viewBox="0 0 880 190" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;">
+            <!-- Connecting bar -->
+            <rect x="155" y="88" width="570" height="12" fill="#1e1e30" rx="6"/>
+
+            <!-- Left weight — Planning (EXPANDS) -->
+            <rect x="10" y="22" width="160" height="146" rx="10" fill="#111a28" stroke="#60a5fa" stroke-width="1.5"/>
+            <text x="90" y="74" text-anchor="middle" fill="#60a5fa" font-size="11" font-family="system-ui" font-weight="700" letter-spacing="0.08em">RESEARCH /</text>
+            <text x="90" y="91" text-anchor="middle" fill="#60a5fa" font-size="11" font-family="system-ui" font-weight="700" letter-spacing="0.08em">PLANNING</text>
+            <text x="90" y="118" text-anchor="middle" fill="#60a5fa" font-size="28" font-family="system-ui">↑</text>
+            <text x="90" y="145" text-anchor="middle" fill="#60a5fa" font-size="9.5" font-family="system-ui">EXPANDS</text>
+
+            <!-- Middle weight — Coding (COLLAPSES) -->
+            <rect x="355" y="65" width="170" height="60" rx="8" fill="#111115" stroke="#2a2a3a" stroke-width="1.5"/>
+            <text x="440" y="91" text-anchor="middle" fill="#4b5563" font-size="11" font-family="system-ui" font-weight="600" letter-spacing="0.08em">CODING</text>
+            <text x="440" y="112" text-anchor="middle" fill="#374151" font-size="9.5" font-family="system-ui">collapses ↓</text>
+
+            <!-- Right weight — Validation (EXPANDS) -->
+            <rect x="710" y="22" width="160" height="146" rx="10" fill="#111e18" stroke="#34d399" stroke-width="1.5"/>
+            <text x="790" y="82" text-anchor="middle" fill="#34d399" font-size="11" font-family="system-ui" font-weight="700" letter-spacing="0.08em">VALIDATION</text>
+            <text x="790" y="118" text-anchor="middle" fill="#34d399" font-size="28" font-family="system-ui">↑</text>
+            <text x="790" y="145" text-anchor="middle" fill="#34d399" font-size="9.5" font-family="system-ui">EXPANDS</text>
+          </svg>
+        </div>
+
+        <div class="two-col" style="gap:32px;">
+          <div>
+            <div class="col-label" style="color:var(--accent-blue);">Left expands — Planning</div>
+            <ul>
+              <li>Specs rigorous enough for a <strong>machine to act on</strong></li>
+              <li>Problem definition, decomposition, risk modeling, test design — now <strong>primary</strong> engineering work</li>
+            </ul>
+          </div>
+          <div>
+            <div class="col-label" style="color:var(--accent-green);">Right expands — Validation</div>
+            <ul>
+              <li>Automated testing, behavioral validation, observability, canary releases</li>
+              <li>The <strong>verification layer</strong> is what makes the factory safe</li>
+            </ul>
+          </div>
+        </div>
+
+        <div style="text-align:center; margin-top:16px; font-size:1.05rem; color:var(--accent); font-style:italic;">
+          "Iteration is cheap. Correctness is still hard."
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════
+         SLIDE 4 — The Factory
+    ════════════════════════════════ -->
+    <div class="slide" id="s4"
+         data-notes="Let the image speak first. Then: 'Software development is the transformation of intent into verified behavior.' Pause on the 'fix the die' line."
+         data-timing="3:30 – 5:30">
+      <div class="timing">3:30 – 5:30</div>
+      <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; width:100%; gap:18px;">
+        <img src="images/Gemini_Generated_Image_c86xfjc86xfjc86x.png"
+             alt="The Factory"
+             style="max-height:78vh; max-width:92vw; object-fit:contain; border-radius:8px;"/>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════
+         SLIDE 5 — The Understanding Layer
+    ════════════════════════════════ -->
+    <div class="slide" id="s5"
+         data-notes="Human Coverage is the photo-worthy slide — slow down here. The definition should be said out loud clearly. Software Biologist: sell the behavior, not the label. End with the shift arrow as a through-line to the close."
+         data-timing="5:30 – 7:00">
+      <div class="timing">5:30 – 7:00</div>
+      <div style="max-width:920px; width:100%;">
+        <h2>The Understanding Layer</h2>
+        <p class="subtitle">The constraint no one is talking about.</p>
+
+        <p style="margin:12px 0; font-size:0.95rem; color:var(--text-dim); line-height:1.6;">
+          We are shipping code <strong>faster than we understand it</strong>. Iteration is cheap. Correctness is hard.
+          But there is a <strong>third constraint</strong>: <span style="color:var(--accent);">comprehension</span>.
+        </p>
+
+        <div class="hc-def">
+          <div class="hc-label">Human Coverage — the metric that matters</div>
+          <div class="hc-text"><strong>% of your codebase requiring active human understanding due to risk and blast radius</strong></div>
+          <div class="hc-sub">
+            Security paths &nbsp;·&nbsp; Billing logic &nbsp;·&nbsp; Cross-system integrations &nbsp;·&nbsp; Ambiguous intent<br/>
+            Flag these at <strong>planning time</strong> — not incident time.
+          </div>
+        </div>
+
+        <div class="two-col" style="gap:32px; margin-top:0;">
+          <div>
+            <div class="col-label">The Software Biologist</div>
+            <ul>
+              <li><strong>Observe</strong> the system — don't just read source code</li>
+              <li>Trace paths, run chaos, read telemetry, rehearse failures</li>
+              <li>Like a biologist: watch what happens; don't sequence every organism</li>
+            </ul>
+          </div>
+          <div>
+            <div class="col-label">With AI agents</div>
+            <ul>
+              <li>Give agents direct access to your observability stack</li>
+              <li>Logs · Metrics · Traces · Alerts</li>
+              <li><strong>Five tools and 40 minutes</strong> → one conversation</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="shift-arrow">
+          <span>building systems</span>
+          <span class="arrow">→</span>
+          <span class="after">understanding systems continuously</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════
+         SLIDE 6 — Close / Manifesto
+    ════════════════════════════════ -->
+    <div class="slide" id="s6"
+         data-notes="Slow down. Click to reveal each line. Each line gets a full breath. The final principle is the last thing they hear — don't rush it. Let silence do the work."
+         data-timing="7:00 – 8:00">
+      <div class="timing" style="color:#222;">7:00 – 8:00</div>
+      <p class="preamble" style="color:#c9c9c9;">
+        The SDLC was built for one constraint: <em style="color:#fff; font-style:italic;">humans are slow at writing code</em>.<br/>
+        That constraint is gone. The system hasn't adapted — yet.
+      </p>
+      <div id="manifesto">
+        <div class="manifesto-line" id="m1">Test what can be tested.</div>
+        <div class="manifesto-line" id="m2">Measure what can be measured.</div>
+        <div class="manifesto-line" id="m3">Simulate what must be explored.</div>
+        <div class="manifesto-line" id="m4">Own everything.</div>
+      </div>
+      <div id="final-line">
+        Engineering success is no longer <em>"we shipped it."</em><br/>
+        It is: <strong>"We understand it — continuously."</strong>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════
+         SLIDE — References
+    ════════════════════════════════ -->
+    <div class="slide" id="s-refs"
+         data-notes="Leave this up during Q&A. The three references are the primary reading — Simon Willison's StrongDM piece is the most concrete real-world example of the factory in production.">
+      <div class="slide-bg" style="background-image:url('images/1_ZFVRe4UaVhquOz5CP0RDIg.gif')"></div>
+      <div style="max-width:940px; width:100%;">
+        <div class="eyebrow">Further Reading</div>
+        <h2 style="margin-bottom:18px;">References</h2>
+
+        <div style="display:grid; grid-template-columns:1fr 260px; gap:16px; align-items:start;">
+
+          <div style="display:flex; flex-direction:column; gap:12px;">
+            <div class="ref-card">
+              <div class="ref-num">01 · Geoffrey Huntley</div>
+              <div class="ref-title">Ralph Wiggum as a "software engineer"</div>
+              <div class="ref-body">Describes the Ralph technique: running an LLM coding agent in a repeating bash loop to autonomously execute software development tasks.</div>
+              <a href="https://ghuntley.com/ralph/" target="_blank">ghuntley.com/ralph/ ↗</a>
+            </div>
+            <div class="ref-card">
+              <div class="ref-num">02 · Steve Yegge</div>
+              <div class="ref-title">Welcome to Gas Town</div>
+              <div class="ref-body">Introduces Gas Town — an orchestration system for running multiple Claude Code instances that automates complex workflows via persistent agent identities and a Git-backed data plane.</div>
+              <a href="https://steve-yegge.medium.com/welcome-to-gas-town-4f25ee16dd04" target="_blank">steve-yegge.medium.com ↗</a>
+            </div>
+            <div class="ref-card">
+              <div class="ref-num">03 · Simon Willison</div>
+              <div class="ref-title">How StrongDM's AI team build serious software without even looking at the code</div>
+              <div class="ref-body">StrongDM's AI coding agents build production software end-to-end — without engineers reviewing the code — validated by comprehensive scenario tests and "Digital Twin Universe" clones of external services.</div>
+              <a href="https://simonwillison.net/2026/Feb/7/software-factory/" target="_blank">simonwillison.net ↗</a>
+            </div>
+          </div>
+
+          <div class="author-card">
+            <div class="col-label">About the Author</div>
+            <p style="font-size:1rem; font-weight:700; color:#fff;">Owen Zanzal</p>
+            <a class="author-link" href="https://medium.com/devops-ai" target="_blank">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="color:var(--accent);flex-shrink:0"><path d="M13.54 12a6.8 6.8 0 01-6.77 6.82A6.8 6.8 0 010 12a6.8 6.8 0 016.77-6.82A6.8 6.8 0 0113.54 12zM20.96 12c0 3.54-1.51 6.42-3.38 6.42-1.87 0-3.39-2.88-3.39-6.42s1.52-6.42 3.39-6.42 3.38 2.88 3.38 6.42M24 12c0 3.17-.53 5.75-1.19 5.75-.66 0-1.19-2.58-1.19-5.75s.53-5.75 1.19-5.75C23.47 6.25 24 8.83 24 12z"/></svg>
+              <div><div class="al-label">Blog</div>medium.com/devops-ai</div>
+            </a>
+            <a class="author-link" href="https://www.linkedin.com/in/owenzanzal/" target="_blank">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="color:var(--accent-blue);flex-shrink:0"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+              <div><div class="al-label">LinkedIn</div>linkedin.com/in/owenzanzal</div>
+            </a>
+            <div style="border-top:1px solid var(--border); padding-top:10px; margin-top:4px;">
+              <div class="col-label" style="margin-bottom:8px;">Tools</div>
+              <a class="author-link" href="https://openobserve.ai/" target="_blank" style="margin-bottom:8px;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent-green);flex-shrink:0"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+                <div><div class="al-label">Observability</div>openobserve.ai</div>
+              </a>
+              <a class="author-link" href="https://docs.anthropic.com/en/docs/claude-code/overview" target="_blank">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent);flex-shrink:0"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                <div><div class="al-label">Claude Code Docs</div>docs.anthropic.com</div>
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════
+         SLIDE — View Online
+    ════════════════════════════════ -->
+    <div class="slide" id="s-qr"
+         data-notes="Leave this up as people leave. Invite them to scan and read the full deck online.">
+      <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; width:100%; gap:28px; text-align:center;">
+        <div class="eyebrow">View Online</div>
+        <a href="https://www.othree.cloud/software-factories/" target="_blank"
+           style="background:#fff; padding:16px; border-radius:12px; display:inline-block; line-height:0;">
+          <img src="images/tqrcg-180426092150.png"
+               alt="QR code — othree.cloud/software-factories"
+               style="width:220px; height:220px; display:block;"/>
+        </a>
+        <a href="https://www.othree.cloud/software-factories/" target="_blank"
+           style="font-size:1.1rem; font-weight:600; color:var(--accent); text-decoration:none; letter-spacing:0.02em;">
+          othree.cloud/software-factories
+        </a>
+        <p style="font-size:0.8rem; color:var(--border);">Scan to open the full slide deck</p>
+      </div>
+    </div>
+
+  </div><!-- #deck -->
+
+  <!-- Progress -->
   <div id="progress"><div id="progress-fill"></div></div>
 
-  <div id="stage">
-
-    <!-- ── Slide 1: Title ─────────────────────────────────── -->
-    <div class="slide active" data-notes="This talk challenges the assumption that AI-assisted development means bolting AI onto existing workflows. Instead, we argue for rebuilding software development from first principles — treating it as a factory engineering problem, not a team coordination problem.">
-      <div class="title-accent"></div>
-      <div class="kicker">Presentation &nbsp;·&nbsp; April 2026</div>
-      <h1>Burning Down<br/>the <em>SDLC</em></h1>
-      <div class="subtitle">The AI Software Factory<br/>Machine-Generated Code and the New Engineering Paradigm</div>
-      <div class="date-tag" style="margin-top:0.5rem"><span style="color:var(--amber);font-weight:700">SDLC</span> &nbsp;·&nbsp; Software Delivery Life Cycle</div>
-      <div class="date-tag">2026-04-11</div>
+  <!-- Controls -->
+  <div id="controls">
+    <div class="left">
+      <span id="slide-num" style="font-variant-numeric:tabular-nums;">1 / 6</span>
+      <span id="slide-name" style="color:var(--text-dim);">Opening Hook</span>
     </div>
-
-    <!-- ── Slide 2: Preface ──────────────────────────────────── -->
-    <div class="slide" style="align-items:center;text-align:center" data-notes="This is the frame for everything that follows. Every dysfunction we'll discuss — ambiguous specs, late defect discovery, human bottlenecks, accountability gaps — predates AI by decades. The difference is that at human coding speed, these problems were manageable. Annoying, even expected. At AI speed, they become existential. That's the shift.">
-      <div class="kicker" style="text-align:center">Preface</div>
-      <blockquote style="max-width:760px;border:none;padding:0;background:none;text-align:center">
-        <p style="font-size:clamp(1.35rem,3vw,2.1rem);font-weight:700;line-height:1.4;color:#fff">
-          AI didn't introduce new problems.
-        </p>
-        <p style="font-size:clamp(1.35rem,3vw,2.1rem);font-weight:700;line-height:1.4;color:var(--muted);margin-top:0.5rem">
-          The problems have always been here —
-        </p>
-        <p style="font-size:clamp(1.35rem,3vw,2.1rem);font-weight:700;line-height:1.4;color:var(--amber);margin-top:0.5rem">
-          AI has simply amplified them to a degree<br/>that makes them impossible to ignore.
-        </p>
-      </blockquote>
+    <div class="right">
+      <span id="timer" title="Press T to start/stop timer">0:00</span>
+      <span class="hint">← → navigate &nbsp;·&nbsp; N notes &nbsp;·&nbsp; T timer &nbsp;·&nbsp; F fullscreen</span>
     </div>
-
-    <!-- ── Slide 3: Current State of the SDLC ───────────────── -->
-    <div class="slide" data-notes="Set the stage before challenging anything. The traditional SDLC is not a bad design — it is a rational response to the actual constraints of its era. The phases exist because humans need handoffs, context-switching costs are real, and review is how you catch errors when you can't automate testing. The problem is not the people who built this system; the problem is that the core constraint it was built around — human coding speed — has been removed. When that happens, every safeguard designed around that constraint becomes overhead.">
-      <div class="kicker">Context</div>
-      <h2>The Current State of the <em>SDLC</em></h2>
-      <p style="font-size:clamp(0.82rem,1.3vw,0.95rem);color:var(--muted);margin-bottom:0.9rem;max-width:720px">The traditional SDLC was built for a world where humans write every line of code. Every phase optimizes around one constraint: <strong style="color:var(--text)">humans are slow.</strong></p>
-      <table style="font-size:clamp(0.72rem,1.1vw,0.88rem)">
-        <thead>
-          <tr><th style="width:140px">Phase</th><th>What Happens</th><th>The Real Cost</th></tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Plan</td>
-            <td>Requirements gathered in meetings; intent captured in prose</td>
-            <td style="color:var(--muted)">Ambiguity baked in from the start — no machine can act on it</td>
-          </tr>
-          <tr>
-            <td>Design</td>
-            <td>Architects produce diagrams; decisions made synchronously</td>
-            <td style="color:var(--muted)">Knowledge siloed in people, not systems</td>
-          </tr>
-          <tr>
-            <td>Build</td>
-            <td>Developers write code, review PRs, coordinate via tickets</td>
-            <td style="color:var(--muted)">Throughput capped by headcount and attention</td>
-          </tr>
-          <tr>
-            <td>Test</td>
-            <td>QA cycles catch regressions; bugs routed back through the queue</td>
-            <td style="color:var(--muted)">Defects discovered late — most expensive to fix</td>
-          </tr>
-          <tr>
-            <td>Deploy</td>
-            <td>Staged rollouts with manual sign-offs and runbooks</td>
-            <td style="color:var(--muted)">Human bottleneck at the point of highest risk</td>
-          </tr>
-        </tbody>
-      </table>
-      <div class="pull-quote" style="margin-top:1rem">
-        <p>When code generation accelerates 10–100×, the SDLC doesn't speed up — it collapses under its own coordination overhead.</p>
-      </div>
-    </div>
-
-    <!-- ── Slide 3: Core Problem ──────────────────────────── -->
-    <div class="slide" data-notes="Most organizations adopting AI coding tools are essentially putting a faster engine in a horse-drawn carriage. The problem isn't speed — it's that the entire vehicle architecture is wrong. When you mirror human roles in AI agents, you inherit all the inefficiencies of human coordination (meetings, handoffs, miscommunication) without any of the benefits (judgment, intuition, accountability).">
-      <div class="kicker">The Problem</div>
-      <h2>Applying <em>Old Models</em> to New Realities</h2>
-      <ul class="bullets">
-        <li>The traditional SDLC is built around <strong>humans writing code</strong> — it becomes a bottleneck when AI generates code at volume</li>
-        <li>The instinct is to create virtual "agent teams" mirroring human roles (coder agent, reviewer agent, PM agent)</li>
-        <li class="highlight">This is a fundamental mistake: simulating human teams introduces communication latency, interpretation drift, and coordination overhead — without the benefits</li>
-        <li>We must stop optimizing an outdated process and <strong>rebuild from first principles</strong></li>
-      </ul>
-    </div>
-
-    <!-- ── Slide 3: Paradigm Shift ────────────────────────── -->
-    <div class="slide" data-notes="This is the central reframe. A factory doesn't have a 'welder role' and a 'quality inspector role' having a meeting. It has stations, each performing a well-defined transformation, with mechanical checks between them. The output of one stage is the input of the next. Quality isn't negotiated — it's enforced by the architecture of the system itself.">
-      <div class="kicker">The Reframe</div>
-      <h2>From <em>Teams</em> to Factories</h2>
-      <div class="pull-quote">
-        <p>Software development is the transformation of intent into verified behavior.</p>
-      </div>
-      <ul class="bullets">
-        <li>Stop focusing on <strong>who</strong> does the work (roles) — focus on <strong>what</strong> transformation happens</li>
-        <li>Think in functions: <code style="background:#1f2d45;padding:2px 6px;border-radius:4px;font-size:0.9em;color:var(--blue)">spec_to_code()</code>&nbsp;&nbsp;<code style="background:#1f2d45;padding:2px 6px;border-radius:4px;font-size:0.9em;color:var(--blue)">code_to_tests()</code>&nbsp;&nbsp;<code style="background:#1f2d45;padding:2px 6px;border-radius:4px;font-size:0.9em;color:var(--blue)">tests_to_verdict()</code></li>
-        <li>In a human team, quality flows through <strong>slow conversations</strong></li>
-        <li>In a software factory, quality is <strong>structurally enforced</strong> through automated quality gates</li>
-        <li>The goal: engineer a deterministic system where producing incorrect software is <em style="color:var(--amber)">difficult</em></li>
-      </ul>
-    </div>
-
-    <!-- ── Slide 4: Architecture ──────────────────────────── -->
-    <div class="slide" data-notes="The Idea Refiner is arguably the most important component. Most factory failures trace back to ambiguous specs, not bad code generation. The Ralph Loop is named for the concept of a tireless, autonomous worker — it doesn't need breaks, doesn't get distracted, and will iterate until tests pass or it exhausts its budget. The Autonomous Verifier is adversarial by design: its job is to break the code, not confirm it works.">
-      <div class="kicker">Architecture</div>
-      <h2>The <em>AI Software Factory</em></h2>
-      <div class="factory-grid">
-        <div class="factory-card">
-          <div class="fc-num">01 · Idea Refiner</div>
-          <div class="fc-title">Eliminate Ambiguity First</div>
-          <div class="fc-body">Interrogates ideas until they become rigorous, testable specifications — before a single line of code is written.</div>
-        </div>
-        <div class="factory-card">
-          <div class="fc-num">02 · Code Generator</div>
-          <div class="fc-title">The Ralph Loop</div>
-          <div class="fc-body">Autonomous, asynchronous loop: takes the spec, writes code, executes commands, runs tests — independently and iteratively.</div>
-        </div>
-        <div class="factory-card">
-          <div class="fc-num">03 · Autonomous Verifier</div>
-          <div class="fc-title">Adversarial Testing</div>
-          <div class="fc-body">Probes deployed code systematically against the original specification. Its job is to break things, not confirm they work.</div>
-        </div>
-        <div class="factory-card">
-          <div class="fc-num">04 · Infrastructure Layer</div>
-          <div class="fc-title">The Connective Tissue</div>
-          <div class="infra-row" style="margin-top:0.5rem">
-            <div class="infra-chip">Orchestrator<span>State machine routing</span></div>
-            <div class="infra-chip">Transformers<span>LLM-powered steps</span></div>
-            <div class="infra-chip">Validators<span>Binary pass/fail</span></div>
-            <div class="infra-chip">State Store<span>Full lineage</span></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── Slide 5: Full-Stack Observability ────────────────── -->
-    <div class="slide" data-notes="The typical debugging workflow is: a user reports an error, an engineer finds it in a dashboard, copies the stack trace, opens the codebase, searches for the relevant file, reads surrounding code, forms a hypothesis, makes a fix. That's a multi-tool, multi-context-switch process. When observability is in the agentic loop, the AI collapses that into a single conversation. You give it an error ID, a time range, or a status code spike — and it can query the same signals your team would use, correlate them to source code, and write the fix.">
-      <div class="kicker">Agentic Loop</div>
-      <h2>Observability <em>in the Loop</em></h2>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;max-width:980px;margin-top:0.6rem;align-items:start">
-
-        <div>
-          <p style="font-size:clamp(0.8rem,1.2vw,0.92rem);color:var(--muted);line-height:1.55;margin-bottom:0.85rem">Give the agent <strong style="color:var(--text)">direct access to your observability stack.</strong> It observes the running application, correlates signals to source code, and closes the loop — without leaving the terminal.</p>
-          <ul class="bullets" style="margin-bottom:1rem">
-            <li>Point it at an error, a time window, or a latency spike</li>
-            <li>It queries logs, traces, and metrics to reconstruct what happened</li>
-            <li>Correlates stack traces and spans back to source files</li>
-            <li>Forms a hypothesis and proposes a fix in the same conversation</li>
-          </ul>
-          <div style="font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:0.5rem">The four signals in the loop</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.4rem">
-            <div style="background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.2);border-radius:6px;padding:0.5rem 0.75rem;font-size:0.78rem;color:var(--blue);font-weight:600">Logs<span style="display:block;color:var(--muted);font-size:0.68rem;font-weight:400;margin-top:0.15rem">errors, request traces, audit events</span></div>
-            <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:6px;padding:0.5rem 0.75rem;font-size:0.78rem;color:var(--amber);font-weight:600">Metrics<span style="display:block;color:var(--muted);font-size:0.68rem;font-weight:400;margin-top:0.15rem">latency, error rates, throughput</span></div>
-            <div style="background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.2);border-radius:6px;padding:0.5rem 0.75rem;font-size:0.78rem;color:var(--green);font-weight:600">Traces<span style="display:block;color:var(--muted);font-size:0.68rem;font-weight:400;margin-top:0.15rem">distributed spans, dependency chains</span></div>
-            <div style="background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2);border-radius:6px;padding:0.5rem 0.75rem;font-size:0.78rem;color:#f87171;font-weight:600">Alerts<span style="display:block;color:var(--muted);font-size:0.68rem;font-weight:400;margin-top:0.15rem">thresholds, anomalies, on-call signals</span></div>
-          </div>
-        </div>
-
-        <div style="display:flex;flex-direction:column;gap:0.75rem">
-          <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1rem 1.25rem">
-            <div style="font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:0.5rem">Before — Multi-tool workflow</div>
-            <div style="font-size:0.8rem;line-height:1.7;color:var(--muted)">
-              User reports error → engineer finds it in dashboard → copies stack trace → opens codebase → searches for file → reads code → forms hypothesis → makes fix
-            </div>
-            <div style="margin-top:0.5rem;font-size:0.75rem;color:#f87171">5+ tools &nbsp;·&nbsp; multiple context switches &nbsp;·&nbsp; minutes to hours</div>
-          </div>
-          <div style="background:var(--surface);border:1px solid rgba(52,211,153,0.3);border-radius:10px;padding:1rem 1.25rem">
-            <div style="font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--green);margin-bottom:0.5rem">After — Agentic loop</div>
-            <div style="font-size:0.8rem;line-height:1.7;color:var(--muted)">
-              "Investigate the latency spike at 14:32" → agent queries logs, traces metrics, reads relevant code, proposes fix
-            </div>
-            <div style="margin-top:0.5rem;font-size:0.75rem;color:var(--green)">1 conversation &nbsp;·&nbsp; 0 context switches &nbsp;·&nbsp; seconds to minutes</div>
-          </div>
-          <div class="pull-quote" style="margin:0">
-            <p style="font-size:clamp(0.78rem,1.1vw,0.88rem)">Works with any backend that exposes an API — Datadog, Grafana, Honeycomb, OpenTelemetry collectors, or self-hosted.</p>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- ── Slide 6: Scaffold ──────────────────────────────── -->
-    <div class="slide" data-notes="Think of a scaffold like a factory floor layout. You don't redesign the factory floor every time you manufacture a new product. The scaffold encodes decisions like 'we use PostgreSQL,' 'our APIs follow this contract pattern,' and 'our folder structure looks like this.' This frees the spec to focus purely on what makes this product unique. When specs try to encode both intent and infrastructure, they become bloated, inconsistent, and ambiguous — exactly the kind of input that causes AI code generation to fail.">
-      <div class="kicker">Spec Design</div>
-      <h2>The Missing <em>Scaffold</em></h2>
-      <div class="pull-quote" style="margin-bottom:1rem">
-        <p>Most AI systems fail because of garbage specifications, not bad code generation.</p>
-      </div>
-      <table class="scaffold-table">
-        <thead>
-          <tr><th>Layer</th><th>Purpose</th><th>Example</th></tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Spec</td>
-            <td>Defines unique product intent — <em>what</em> and <em>why</em></td>
-            <td style="color:var(--muted)">User stories, acceptance criteria, edge cases</td>
-          </tr>
-          <tr>
-            <td>Scaffold</td>
-            <td>Encodes repeatable technical defaults — a minimal, executable starter repo</td>
-            <td style="color:var(--muted)">DB choice, folder structure, API contract patterns</td>
-          </tr>
-          <tr>
-            <td>Verification Layer</td>
-            <td>Mechanically enforces rules</td>
-            <td style="color:var(--muted)">Linting, type checks, contract tests</td>
-          </tr>
-        </tbody>
-      </table>
-      <p style="margin-top:1rem;font-size:0.85rem;color:var(--muted)">Clean separation of concerns: <span style="color:var(--amber)">intent</span> vs. <span style="color:var(--blue)">defaults</span> vs. <span style="color:var(--green)">enforcement</span></p>
-    </div>
-
-    <!-- ── Slide 6: Metrics ───────────────────────────────── -->
-    <div class="slide" data-notes="'60% of our code is AI-generated' tells you nothing useful. It's like measuring a factory's output by what percentage of welds were done by robots. The question that matters is: what percentage of output requires a human to inspect it before shipping? If your verification layer is strong enough, the answer should be 'only the parts where failure is catastrophic and the spec was ambiguous.' Everything else flows through the factory with mechanical confidence.">
-      <div class="kicker">Metrics</div>
-      <h2>The <em>Illusion</em> of "AI-Generated Code"</h2>
-      <div class="metric-row">
-        <div class="metric-card mc-bad">
-          <div class="mc-label">Wrong Metric</div>
-          <div class="mc-val">% AI code</div>
-        </div>
-        <div class="metric-card mc-good">
-          <div class="mc-label">Right Metric</div>
-          <div class="mc-val">Human Coverage</div>
-        </div>
-      </div>
-      <p style="font-size:0.9rem;color:var(--muted);margin-bottom:0.75rem;max-width:700px"><strong style="color:var(--text)">Human Coverage:</strong> the percentage of code requiring human review due to risk and system-level impact.</p>
-      <ul class="bullets">
-        <li>Risk models should flag high-consequence areas early in the <strong>planning phase</strong>: security-critical paths, billing logic, ambiguous intent, cross-system integration</li>
-        <li>Goal: drive Human Coverage toward <strong style="color:var(--green)">zero</strong> through structural guarantees — not by quietly removing accountability</li>
-        <li>Human review should become <strong>unnecessary</strong>, not just skipped</li>
-      </ul>
-    </div>
-
-    <!-- ── Slide 7: Validation + Accountability ───────────── -->
-    <div class="slide" data-notes="This is where the factory metaphor meets organizational reality. A factory that produces perfect output 99.9% of the time still needs someone who understands *why* it works, so that when the 0.1% failure happens, there's a human who can diagnose it, explain it to stakeholders, and decide what to do. Accountability can't be automated — it's the human layer that sits above the machine layer. Without it, you have a system that works until it doesn't, and then nobody knows why.">
-      <div class="kicker">Validation</div>
-      <h2>The <em>Fourth Layer</em></h2>
-      <div class="layer-stack">
-        <div class="layer">
-          <div class="layer-num det">1</div>
-          <div class="layer-title">Deterministic</div>
-          <div class="layer-desc">Binary correctness — unit tests, type checks, contract tests</div>
-        </div>
-        <div class="layer">
-          <div class="layer-num qnt">2</div>
-          <div class="layer-title">Quantitative</div>
-          <div class="layer-desc">Observability and metrics — latency, error rates, resource usage</div>
-        </div>
-        <div class="layer">
-          <div class="layer-num prb">3</div>
-          <div class="layer-title">Probabilistic</div>
-          <div class="layer-desc">Scenario-based behavior simulation — chaos engineering, property tests</div>
-        </div>
-        <div class="layer" style="border-color:rgba(248,113,113,0.35)">
-          <div class="layer-num acc">4</div>
-          <div class="layer-title">Accountability</div>
-          <div class="layer-desc"><strong style="color:#fff">Critical paths must have explicit human owners.</strong> Owners understand behavior, trace failures, and own residual risk. Accountability is not review — it is ongoing ownership of system understanding.</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── Slide 8: New Roles ─────────────────────────────── -->
-    <div class="slide" data-notes="These roles represent a fundamental shift in what it means to be a software professional. The PM becomes more technical — they need to express intent precisely enough for machines to act on it. The engineer becomes more strategic — they're managing a production system, not hand-crafting artisanal code. The Software Biologist is perhaps the most novel: as systems become too large and fast-moving to understand by reading code, we need people who understand them the way biologists understand ecosystems — through observation, experimentation, and pattern recognition. The Factory Builder is the person who keeps the meta-system running.">
-      <div class="kicker">Org Design</div>
-      <h2>The <em>New Engineering</em> Roles</h2>
-      <table>
-        <thead>
-          <tr><th>Role</th><th>Focus</th></tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Empowered PM</td>
-            <td>Builds working prototypes; crafts rigorous specs with testable definitions of done — not slide decks</td>
-          </tr>
-          <tr>
-            <td>Factory Manager</td>
-            <td>Reviews automated assessment reports, makes architectural judgments, intervenes in factory outputs — not writing lines of code</td>
-          </tr>
-          <tr>
-            <td>Software Biologist</td>
-            <td>Understands systems by <em>observing</em> them in production: tracing request paths, running chaos experiments, reading telemetry — not reading source code</td>
-          </tr>
-          <tr>
-            <td>Factory Builder</td>
-            <td>Designs agent pipelines, manages token economics, keeps the AI factory running reliably — the evolution of DevOps</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- ── Slide 9: Conclusion ────────────────────────────── -->
-    <div class="slide" data-notes="This is not a future prediction — it's a description of what's already happening. Teams that cling to the traditional SDLC with AI bolted on will drown in review queues and coordination overhead. Teams that reconceive development as factory engineering — with clear transformations, structural quality gates, and human accountability at the top — will ship faster, safer, and with better understanding of their systems than ever before. The question isn't whether to make this shift, but how quickly you can.">
-      <div class="kicker">Conclusion</div>
-      <h2>Engineering <em>Beyond</em> the Bottleneck</h2>
-      <ul class="bullets" style="margin-bottom:1rem">
-        <li>The volume and velocity of AI-generated software are <strong>permanently increasing</strong></li>
-        <li>Adding more human review to the old SDLC will only cause teams to <strong>fall further behind</strong></li>
-        <li>The future belongs to teams that shift from <strong>building systems</strong> to <strong>understanding them</strong></li>
-        <li>AI-driven development is a <strong>factory engineering challenge</strong>, not a staffing problem</li>
-      </ul>
-      <div class="manifesto">
-        <div class="manifesto-line">Test what can be tested.</div>
-        <div class="manifesto-line">Measure what can be measured.</div>
-        <div class="manifesto-line">Simulate what must be explored.</div>
-        <div class="manifesto-line" style="color:var(--blue)">Own everything.</div>
-      </div>
-    </div>
-
-    <!-- ── Slide 11: References ──────────────────────────────── -->
-    <div class="slide" data-notes="">
-      <div class="kicker">Further Reading</div>
-      <h2>References</h2>
-      <div style="display:grid;grid-template-columns:1fr 280px;gap:1.5rem;max-width:960px;margin-top:0.5rem;align-items:start">
-
-        <!-- Left column: articles -->
-        <div style="display:flex;flex-direction:column;gap:0.85rem">
-          <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1rem 1.25rem">
-            <div style="font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--amber);margin-bottom:0.3rem">01 · Geoffrey Huntley</div>
-            <div style="font-size:clamp(0.88rem,1.3vw,1rem);font-weight:700;color:#fff;margin-bottom:0.25rem">Ralph Wiggum as a "software engineer"</div>
-            <div style="font-size:clamp(0.72rem,1vw,0.82rem);color:var(--muted);line-height:1.5;margin-bottom:0.5rem">Describes the Ralph technique: running an LLM coding agent in a repeating bash loop to autonomously execute software development tasks.</div>
-            <a href="https://ghuntley.com/ralph/" target="_blank" style="font-size:0.78rem;color:var(--blue);text-decoration:none">ghuntley.com/ralph/ ↗</a>
-          </div>
-          <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1rem 1.25rem">
-            <div style="font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--amber);margin-bottom:0.3rem">02 · Steve Yegge</div>
-            <div style="font-size:clamp(0.88rem,1.3vw,1rem);font-weight:700;color:#fff;margin-bottom:0.25rem">Welcome to Gas Town</div>
-            <div style="font-size:clamp(0.72rem,1vw,0.82rem);color:var(--muted);line-height:1.5;margin-bottom:0.5rem">Introduces Gas Town, an orchestration system for running multiple Claude Code instances that automates complex workflows via persistent agent identities and a Git-backed data plane.</div>
-            <a href="https://steve-yegge.medium.com/welcome-to-gas-town-4f25ee16dd04" target="_blank" style="font-size:0.78rem;color:var(--blue);text-decoration:none">steve-yegge.medium.com ↗</a>
-          </div>
-          <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1rem 1.25rem">
-            <div style="font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--amber);margin-bottom:0.3rem">03 · Simon Willison</div>
-            <div style="font-size:clamp(0.88rem,1.3vw,1rem);font-weight:700;color:#fff;margin-bottom:0.25rem">How StrongDM's AI team build serious software without even looking at the code</div>
-            <div style="font-size:clamp(0.72rem,1vw,0.82rem);color:var(--muted);line-height:1.5;margin-bottom:0.5rem">StrongDM's AI coding agents build production software end-to-end — without engineers reviewing the code — validated by comprehensive scenario tests and "Digital Twin Universe" clones of external services.</div>
-            <a href="https://simonwillison.net/2026/Feb/7/software-factory/" target="_blank" style="font-size:0.78rem;color:var(--blue);text-decoration:none">simonwillison.net ↗</a>
-          </div>
-        </div>
-
-        <!-- Right column: about the author -->
-        <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.25rem;display:flex;flex-direction:column;gap:1rem">
-          <div style="font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)">About the Author</div>
-          <div style="font-size:clamp(0.9rem,1.3vw,1rem);font-weight:700;color:#fff">Owen Zanzal</div>
-          <a href="https://medium.com/devops-ai" target="_blank" style="display:flex;align-items:center;gap:0.6rem;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:0.65rem 0.9rem;text-decoration:none;color:var(--text);font-size:0.83rem;font-weight:600" onmouseover="this.style.borderColor='var(--amber)'" onmouseout="this.style.borderColor='var(--border)'">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" style="color:var(--amber);flex-shrink:0"><path d="M13.54 12a6.8 6.8 0 01-6.77 6.82A6.8 6.8 0 010 12a6.8 6.8 0 016.77-6.82A6.8 6.8 0 0113.54 12zM20.96 12c0 3.54-1.51 6.42-3.38 6.42-1.87 0-3.39-2.88-3.39-6.42s1.52-6.42 3.39-6.42 3.38 2.88 3.38 6.42M24 12c0 3.17-.53 5.75-1.19 5.75-.66 0-1.19-2.58-1.19-5.75s.53-5.75 1.19-5.75C23.47 6.25 24 8.83 24 12z"/></svg>
-            <div>
-              <div style="font-size:0.7rem;color:var(--muted);margin-bottom:0.1rem">Blog</div>
-              medium.com/devops-ai
-            </div>
-          </a>
-          <a href="https://www.linkedin.com/in/owenzanzal/" target="_blank" style="display:flex;align-items:center;gap:0.6rem;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:0.65rem 0.9rem;text-decoration:none;color:var(--text);font-size:0.83rem;font-weight:600" onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--border)'">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" style="color:var(--blue);flex-shrink:0"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-            <div>
-              <div style="font-size:0.7rem;color:var(--muted);margin-bottom:0.1rem">LinkedIn</div>
-              linkedin.com/in/owenzanzal
-            </div>
-          </a>
-          <div style="border-top:1px solid var(--border);padding-top:0.75rem;margin-top:0.25rem">
-            <div style="font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:0.6rem">Tools &amp; Docs</div>
-            <a href="https://openobserve.ai/" target="_blank" style="display:flex;align-items:center;gap:0.6rem;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:0.55rem 0.9rem;text-decoration:none;color:var(--text);font-size:0.8rem;font-weight:600;margin-bottom:0.5rem" onmouseover="this.style.borderColor='var(--green)'" onmouseout="this.style.borderColor='var(--border)'">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--green);flex-shrink:0"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
-              <div>
-                <div style="font-size:0.67rem;color:var(--muted);margin-bottom:0.1rem">Observability</div>
-                openobserve.ai
-              </div>
-            </a>
-            <a href="https://code.claude.com/docs/en/monitoring-usage" target="_blank" style="display:flex;align-items:center;gap:0.6rem;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:0.55rem 0.9rem;text-decoration:none;color:var(--text);font-size:0.8rem;font-weight:600" onmouseover="this.style.borderColor='var(--amber)'" onmouseout="this.style.borderColor='var(--border)'">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--amber);flex-shrink:0"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-              <div>
-                <div style="font-size:0.67rem;color:var(--muted);margin-bottom:0.1rem">Claude Code Docs</div>
-                Monitoring Usage
-              </div>
-            </a>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-  </div><!-- #stage -->
-
-  <!-- ── Footer ──────────────────────────────────────────── -->
-  <div id="footer">
-    <button class="nav-btn" id="prev-btn">← Prev</button>
-    <div style="display:flex;align-items:center;gap:1.5rem">
-      <span id="slide-counter">1 / 9</span>
-      <button id="note-toggle">speaker notes (N)</button>
-    </div>
-    <button class="nav-btn" id="next-btn">Next →</button>
   </div>
-</div>
 
-<!-- ── Speaker Notes Overlay ─────────────────────────────── -->
-<div id="notes-panel">
-  <div id="notes-box">
-    <h3>Speaker Notes</h3>
-    <div id="notes-content"></div>
-    <button id="notes-close">Close (Esc)</button>
+  <!-- Notes panel -->
+  <div id="notes-panel">
+    <div id="notes-inner">
+      <span>Speaker Note</span>
+      <p id="notes-text"></p>
+    </div>
   </div>
-</div>
+</div><!-- #app -->
 
 <script>
-  // Inject background GIFs by slide index
-  const bgImages = [
-    'images/1_AQiVwBSQgmBiS2B_HayCiw.gif',  // 1  Title          — floating cubes/grid
-    'images/1_NlUNa0yk_BjW5qmiJJjnXg.gif',  // 2  Preface        — light streams
-    'images/1_fXQNfXL66sg_IyP32u1c-w.gif',  // 3  Current State  — abstract
-    'images/1_NECF25WLm4whwe-VeJDadw.gif',  // 4  Core Problem   — abstract
-    'images/1_LIAAE42h4IZ3ZKsydfS4Ig.gif',  // 5  Paradigm Shift — amber network
-    'images/1_ZFVRe4UaVhquOz5CP0RDIg.gif',  // 6  Architecture     — circuit board
-    'images/1_NlUNa0yk_BjW5qmiJJjnXg.gif',  // 7  Observability    — light streams
-    'images/1_NYneQk49nCINxYm8jdrZOA.gif',  // 8  Scaffold         — abstract
-    'images/1_Z7NhuVfrLsDLre-32g3Edw.gif',  // 9  Metrics          — abstract
-    'images/1_oduA7mzesH2tqMWCKKz4cg.gif',  // 10 Validation       — crystal/glass
-    'images/1_LIAAE42h4IZ3ZKsydfS4Ig.gif',  // 11 New Roles        — amber network
-    'images/1_AQiVwBSQgmBiS2B_HayCiw.gif',  // 12 Conclusion       — cubes (callback)
-    'images/1_ZFVRe4UaVhquOz5CP0RDIg.gif',  // 13 References       — circuit board
-  ];
-
   const slides = Array.from(document.querySelectorAll('.slide'));
-  slides.forEach((slide, i) => {
-    if (!bgImages[i]) return;
-    const bg = document.createElement('div');
-    bg.className = 'slide-bg';
-    bg.style.backgroundImage = `url(${bgImages[i]})`;
-    slide.insertBefore(bg, slide.firstChild);
-  });
-  const total = slides.length; // auto-derived from DOM
+  const total = slides.length;
+  const progressFill = document.getElementById('progress-fill');
+  const slideNum = document.getElementById('slide-num');
+  const slideName = document.getElementById('slide-name');
+  const timerEl = document.getElementById('timer');
+  const notesPanel = document.getElementById('notes-panel');
+  const notesText = document.getElementById('notes-text');
+
   let current = 0;
   let notesOpen = false;
+  let timerRunning = false;
+  let timerStart = null;
+  let timerInterval = null;
 
-  const progressFill = document.getElementById('progress-fill');
-  const counter = document.getElementById('slide-counter');
-  const notesPanel = document.getElementById('notes-panel');
-  const notesContent = document.getElementById('notes-content');
+  // Manifesto reveal
+  const manifestoIds = ['m1','m2','m3','m4'];
+  let mStep = 0;
 
-  function goTo(idx) {
+  function updateUI() {
+    progressFill.style.width = `${((current + 1) / total) * 100}%`;
+    slideNum.textContent = `${current + 1} / ${total}`;
+    slideName.textContent = slides[current].dataset.notes
+      ? slides[current].id.replace('s','') + ' — ' + (slides[current].querySelector('h2') ? slides[current].querySelector('h2').textContent : 'Opening Hook')
+      : 'Opening Hook';
+    // Derive name from h2 or eyebrow
+    const h2 = slides[current].querySelector('h2');
+    const eyebrow = slides[current].querySelector('.eyebrow');
+    slideName.textContent = h2 ? h2.textContent : (eyebrow ? eyebrow.textContent : '');
+
+    if (notesOpen) {
+      notesText.textContent = slides[current].dataset.notes || '';
+    }
+  }
+
+  function goTo(idx, dir) {
     if (idx < 0 || idx >= total) return;
-    const old = slides[current];
-    old.classList.remove('active');
-    old.classList.add('exit-left');
-    setTimeout(() => old.classList.remove('exit-left'), 450);
+    const prev = slides[current];
+    const next = slides[idx];
 
+    prev.classList.remove('active');
+    prev.classList.add('prev');
+    setTimeout(() => prev.classList.remove('prev'), 400);
+
+    next.classList.add('active');
     current = idx;
-    slides[current].classList.add('active');
+    updateUI();
 
-    const pct = ((current + 1) / total) * 100;
-    progressFill.style.width = pct + '%';
-    counter.textContent = (current + 1) + ' / ' + total;
-
-    if (notesOpen) showNotes();
+    // Reset manifesto if navigating away
+    if (current !== 6) resetManifesto();
   }
 
-  function next() { goTo(current + 1); }
-  function prev() { goTo(current - 1); }
-
-  document.getElementById('next-btn').addEventListener('click', next);
-  document.getElementById('prev-btn').addEventListener('click', prev);
-
-  function showNotes() {
-    notesContent.textContent = slides[current].dataset.notes || '(no notes)';
-    notesPanel.classList.add('open');
-    notesOpen = true;
-  }
-  function hideNotes() {
-    notesPanel.classList.remove('open');
-    notesOpen = false;
+  function resetManifesto() {
+    mStep = 0;
+    manifestoIds.forEach(id => document.getElementById(id).classList.remove('lit'));
+    document.getElementById('final-line').classList.remove('lit');
   }
 
-  document.getElementById('note-toggle').addEventListener('click', () => notesOpen ? hideNotes() : showNotes());
-  document.getElementById('notes-close').addEventListener('click', hideNotes);
-  notesPanel.addEventListener('click', e => { if (e.target === notesPanel) hideNotes(); });
+  function advance() {
+    if (current === 6) {
+      if (mStep < manifestoIds.length) {
+        document.getElementById(manifestoIds[mStep]).classList.add('lit');
+        mStep++;
+        return;
+      }
+      if (mStep === manifestoIds.length) {
+        document.getElementById('final-line').classList.add('lit');
+        mStep++;
+        return;
+      }
+      // manifesto fully revealed — advance to references
+    }
+    goTo(current + 1, 1);
+  }
 
+  function retreat() {
+    if (current === 6 && mStep > 0) {
+      mStep--;
+      if (mStep === manifestoIds.length) {
+        document.getElementById('final-line').classList.remove('lit');
+      } else {
+        document.getElementById(manifestoIds[mStep]).classList.remove('lit');
+      }
+      return;
+    }
+    goTo(current - 1, -1);
+  }
+
+  function toggleNotes() {
+    notesOpen = !notesOpen;
+    notesPanel.classList.toggle('open', notesOpen);
+    if (notesOpen) notesText.textContent = slides[current].dataset.notes || '';
+  }
+
+  function toggleTimer() {
+    if (!timerRunning) {
+      timerStart = Date.now();
+      timerInterval = setInterval(() => {
+        const s = Math.floor((Date.now() - timerStart) / 1000);
+        const m = Math.floor(s / 60);
+        const sec = s % 60;
+        timerEl.textContent = `${m}:${sec.toString().padStart(2,'0')}`;
+        timerEl.classList.remove('warning','over');
+        if (s >= 480) timerEl.classList.add('over');
+        else if (s >= 420) timerEl.classList.add('warning');
+      }, 500);
+      timerRunning = true;
+    } else {
+      clearInterval(timerInterval);
+      timerRunning = false;
+    }
+  }
+
+  // Keyboard
   document.addEventListener('keydown', e => {
-    if (notesOpen && e.key === 'Escape') { hideNotes(); return; }
-    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); next(); }
-    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')  { e.preventDefault(); prev(); }
-    if (e.key === 'n' || e.key === 'N') { notesOpen ? hideNotes() : showNotes(); }
+    switch(e.key) {
+      case 'ArrowRight': case 'ArrowDown': case ' ':
+        e.preventDefault(); advance(); break;
+      case 'ArrowLeft': case 'ArrowUp':
+        e.preventDefault(); retreat(); break;
+      case 'n': case 'N': toggleNotes(); break;
+      case 't': case 'T': toggleTimer(); break;
+      case 'f': case 'F':
+        !document.fullscreenElement
+          ? document.documentElement.requestFullscreen()
+          : document.exitFullscreen();
+        break;
+    }
   });
 
-  // Init progress
-  progressFill.style.width = ((1) / total * 100) + '%';
+  // Click deck to advance
+  document.getElementById('deck').addEventListener('click', advance);
+
+  // Init
+  updateUI();
 </script>
 </body>
 </html>
