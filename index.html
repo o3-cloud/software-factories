@@ -1,924 +1,1601 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Software Factories — 8-Minute Talk</title>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>AI Software Factories — 8-Minute Talk</title>
+        <style>
+            *,
+            *::before,
+            *::after {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
 
-    :root {
-      --bg: #0a0a0f;
-      --bg-card: #141420;
-      --text: #f0f0ee;
-      --text-dim: #9ca3af;
-      --accent: #f59e0b;
-      --accent-blue: #60a5fa;
-      --accent-green: #34d399;
-      --border: #2a2a3a;
-    }
+            :root {
+                --bg: #0a0a0f;
+                --bg-card: #141420;
+                --text: #f0f0ee;
+                --text-dim: #9ca3af;
+                --accent: #f59e0b;
+                --accent-blue: #60a5fa;
+                --accent-green: #34d399;
+                --border: #2a2a3a;
+            }
 
-    html, body {
-      height: 100%;
-      width: 100%;
-      overflow: hidden;
-      font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-    }
+            html,
+            body {
+                height: 100%;
+                width: 100%;
+                overflow: hidden;
+                font-family:
+                    -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI",
+                    sans-serif;
+                background: var(--bg);
+                color: var(--text);
+            }
 
-    /* ─── Layout ─────────────────────────────────────────── */
-    #app {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-    }
+            /* ─── Layout ─────────────────────────────────────────── */
+            #app {
+                display: flex;
+                flex-direction: column;
+                height: 100%;
+            }
 
-    #deck {
-      flex: 1;
-      position: relative;
-      overflow: hidden;
-    }
+            #deck {
+                flex: 1;
+                position: relative;
+                overflow: hidden;
+            }
 
-    /* ─── Slides ─────────────────────────────────────────── */
-    .slide {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding: 48px 72px;
-      opacity: 0;
-      transform: translateX(60px);
-      transition: opacity 0.35s ease, transform 0.35s ease;
-      pointer-events: none;
-    }
+            /* ─── Slides ─────────────────────────────────────────── */
+            .slide {
+                position: absolute;
+                inset: 0;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                padding: 48px 72px;
+                opacity: 0;
+                transform: translateX(60px);
+                transition:
+                    opacity 0.35s ease,
+                    transform 0.35s ease;
+                pointer-events: none;
+            }
 
-    .slide.active {
-      opacity: 1;
-      transform: translateX(0);
-      pointer-events: auto;
-    }
+            .slide.active {
+                opacity: 1;
+                transform: translateX(0);
+                pointer-events: auto;
+            }
 
-    .slide.prev {
-      opacity: 0;
-      transform: translateX(-60px);
-    }
+            .slide.prev {
+                opacity: 0;
+                transform: translateX(-60px);
+            }
 
-    /* ─── Typography ─────────────────────────────────────── */
-    .eyebrow {
-      font-size: 0.7rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 10px;
-    }
+            /* ─── Typography ─────────────────────────────────────── */
+            .eyebrow {
+                font-size: 0.7rem;
+                letter-spacing: 0.18em;
+                text-transform: uppercase;
+                color: var(--accent);
+                margin-bottom: 10px;
+            }
 
-    h2 {
-      font-size: 2.6rem;
-      font-weight: 800;
-      line-height: 1.1;
-      letter-spacing: -0.02em;
-    }
+            h2 {
+                font-size: 2.6rem;
+                font-weight: 800;
+                line-height: 1.1;
+                letter-spacing: -0.02em;
+            }
 
-    .subtitle {
-      font-size: 0.95rem;
-      color: var(--text-dim);
-      font-style: italic;
-      margin-top: 6px;
-      margin-bottom: 4px;
-    }
+            .subtitle {
+                font-size: 0.95rem;
+                color: var(--text-dim);
+                font-style: italic;
+                margin-top: 6px;
+                margin-bottom: 4px;
+            }
 
-    strong { color: var(--text); font-weight: 600; }
+            strong {
+                color: var(--text);
+                font-weight: 600;
+            }
 
-    /* ─── Lists ──────────────────────────────────────────── */
-    ul { list-style: none; }
-    ul li {
-      position: relative;
-      padding-left: 18px;
-      margin-bottom: 9px;
-      font-size: 1rem;
-      line-height: 1.55;
-      color: var(--text-dim);
-    }
-    ul li::before {
-      content: '—';
-      position: absolute;
-      left: 0;
-      color: var(--accent);
-      font-weight: 700;
-    }
+            /* ─── Lists ──────────────────────────────────────────── */
+            ul {
+                list-style: none;
+            }
+            ul li {
+                position: relative;
+                padding-left: 18px;
+                margin-bottom: 9px;
+                font-size: 1rem;
+                line-height: 1.55;
+                color: var(--text-dim);
+            }
+            ul li::before {
+                content: "—";
+                position: absolute;
+                left: 0;
+                color: var(--accent);
+                font-weight: 700;
+            }
 
-    /* ─── Col label ──────────────────────────────────────── */
-    .col-label {
-      font-size: 0.65rem;
-      text-transform: uppercase;
-      letter-spacing: 0.14em;
-      color: var(--accent);
-      margin-bottom: 10px;
-      font-weight: 600;
-    }
+            /* ─── Col label ──────────────────────────────────────── */
+            .col-label {
+                font-size: 0.65rem;
+                text-transform: uppercase;
+                letter-spacing: 0.14em;
+                color: var(--accent);
+                margin-bottom: 10px;
+                font-weight: 600;
+            }
 
-    /* ─── Two-column grid ────────────────────────────────── */
-    .two-col {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 44px;
-      width: 100%;
-    }
+            /* ─── Two-column grid ────────────────────────────────── */
+            .two-col {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 44px;
+                width: 100%;
+            }
 
-    /* ─── Quote block ────────────────────────────────────── */
-    .pull-quote {
-      border-left: 3px solid var(--accent);
-      padding: 12px 20px;
-      background: rgba(245,158,11,0.06);
-      border-radius: 0 6px 6px 0;
-      font-style: italic;
-      font-size: 0.95rem;
-      color: var(--text);
-      line-height: 1.6;
-    }
+            /* ─── Quote block ────────────────────────────────────── */
+            .pull-quote {
+                border-left: 3px solid var(--accent);
+                padding: 12px 20px;
+                background: rgba(245, 158, 11, 0.06);
+                border-radius: 0 6px 6px 0;
+                font-style: italic;
+                font-size: 0.95rem;
+                color: var(--text);
+                line-height: 1.6;
+            }
 
-    /* ─── Timing badge ───────────────────────────────────── */
-    .timing {
-      position: absolute;
-      top: 18px;
-      right: 22px;
-      font-size: 0.62rem;
-      color: var(--border);
-      letter-spacing: 0.08em;
-      font-variant-numeric: tabular-nums;
-    }
+            /* ─── Timing badge ───────────────────────────────────── */
+            .timing {
+                position: absolute;
+                top: 18px;
+                right: 22px;
+                font-size: 0.62rem;
+                color: var(--border);
+                letter-spacing: 0.08em;
+                font-variant-numeric: tabular-nums;
+            }
 
-    /* ─── Progress + controls ────────────────────────────── */
-    #progress {
-      height: 2px;
-      background: var(--border);
-    }
-    #progress-fill {
-      height: 100%;
-      background: var(--accent);
-      transition: width 0.35s ease;
-    }
+            /* ─── Progress + controls ────────────────────────────── */
+            #progress {
+                height: 2px;
+                background: var(--border);
+            }
+            #progress-fill {
+                height: 100%;
+                background: var(--accent);
+                transition: width 0.35s ease;
+            }
 
-    #controls {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 24px;
-      border-top: 1px solid var(--border);
-      font-size: 0.75rem;
-      color: var(--text-dim);
-      flex-shrink: 0;
-    }
+            #controls {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 10px 24px;
+                border-top: 1px solid var(--border);
+                font-size: 0.75rem;
+                color: var(--text-dim);
+                flex-shrink: 0;
+            }
 
-    #controls .left { display: flex; gap: 16px; align-items: center; }
-    #controls .right { display: flex; gap: 16px; align-items: center; }
+            #controls .left {
+                display: flex;
+                gap: 16px;
+                align-items: center;
+            }
+            #controls .right {
+                display: flex;
+                gap: 16px;
+                align-items: center;
+            }
 
-    #timer { font-variant-numeric: tabular-nums; cursor: pointer; }
-    #timer.warning { color: var(--accent); }
-    #timer.over { color: #ef4444; }
+            #timer {
+                font-variant-numeric: tabular-nums;
+                cursor: pointer;
+            }
+            #timer.warning {
+                color: var(--accent);
+            }
+            #timer.over {
+                color: #ef4444;
+            }
 
-    .hint { color: var(--border); font-size: 0.68rem; }
+            .hint {
+                color: var(--border);
+                font-size: 0.68rem;
+            }
 
-    /* ─── Notes panel ────────────────────────────────────── */
-    #notes-panel {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.3s ease;
-      background: #111120;
-      border-top: 1px solid var(--border);
-      font-size: 0.8rem;
-      color: var(--text-dim);
-      flex-shrink: 0;
-    }
-    #notes-panel.open { max-height: 110px; }
-    #notes-inner { padding: 10px 24px; }
-    #notes-inner span {
-      display: block;
-      font-size: 0.65rem;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--accent);
-      margin-bottom: 4px;
-    }
+            /* ─── Notes panel ────────────────────────────────────── */
+            #notes-panel {
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.3s ease;
+                background: #111120;
+                border-top: 1px solid var(--border);
+                font-size: 0.8rem;
+                color: var(--text-dim);
+                flex-shrink: 0;
+            }
+            #notes-panel.open {
+                max-height: 110px;
+            }
+            #notes-inner {
+                padding: 10px 24px;
+            }
+            #notes-inner span {
+                display: block;
+                font-size: 0.65rem;
+                text-transform: uppercase;
+                letter-spacing: 0.12em;
+                color: var(--accent);
+                margin-bottom: 4px;
+            }
 
-    /* ═══════════════════════════════════════════════════════
+            /* ═══════════════════════════════════════════════════════
        SLIDE-SPECIFIC STYLES
     ═══════════════════════════════════════════════════════ */
 
-    /* ── Slide 1: Hook ── */
-    #s1 { background: #07070d; }
-    #s1 blockquote {
-      font-size: 1.55rem;
-      line-height: 1.55;
-      font-style: italic;
-      color: var(--text);
-      border-left: 3px solid var(--accent);
-      padding-left: 28px;
-      max-width: 820px;
-      margin-bottom: 28px;
-    }
-    #s1 .hook-bottom {
-      max-width: 820px;
-      width: 100%;
-      display: flex;
-      gap: 32px;
-      align-items: baseline;
-    }
-    #s1 .hook-bottom .boring {
-      font-size: 1.25rem;
-      color: var(--text-dim);
-    }
-    #s1 .hook-bottom .scary {
-      font-size: 1.55rem;
-      font-weight: 700;
-      color: var(--accent);
-    }
+            /* ── Slide 1: Hook ── */
+            #s1 {
+                background: #07070d;
+            }
+            #s1 blockquote {
+                font-size: 1.55rem;
+                line-height: 1.55;
+                font-style: italic;
+                color: var(--text);
+                border-left: 3px solid var(--accent);
+                padding-left: 28px;
+                max-width: 820px;
+                margin-bottom: 28px;
+            }
+            #s1 .hook-bottom {
+                max-width: 820px;
+                width: 100%;
+                display: flex;
+                gap: 32px;
+                align-items: baseline;
+            }
+            #s1 .hook-bottom .boring {
+                font-size: 1.25rem;
+                color: var(--text-dim);
+            }
+            #s1 .hook-bottom .scary {
+                font-size: 1.55rem;
+                font-weight: 700;
+                color: var(--accent);
+            }
 
-    /* ── Slide 3: Barbell ── */
-    #s3 .barbell-wrap {
-      width: 100%;
-      max-width: 860px;
-      margin: 20px 0 16px;
-    }
+            /* ── Slide 3: Barbell ── */
+            #s3 .barbell-wrap {
+                width: 100%;
+                max-width: 860px;
+                margin: 20px 0 16px;
+            }
 
-    /* ── Slide 4: Factory ── */
-    .factory-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      width: 100%;
-      max-width: 900px;
-      margin: 18px 0 14px;
-    }
-    .f-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 16px 18px;
-    }
-    .f-card.critical { border-color: var(--accent); }
-    .f-card .f-num {
-      font-size: 0.62rem;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--text-dim);
-      margin-bottom: 6px;
-    }
-    .f-card.critical .f-num { color: var(--accent); }
-    .f-card .f-title {
-      font-size: 1.05rem;
-      font-weight: 700;
-      margin-bottom: 4px;
-    }
-    .f-card .f-desc {
-      font-size: 0.82rem;
-      color: var(--text-dim);
-      line-height: 1.5;
-    }
+            /* ── Slide 4: Factory ── */
+            .factory-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+                width: 100%;
+                max-width: 900px;
+                margin: 18px 0 14px;
+            }
+            .f-card {
+                background: var(--bg-card);
+                border: 1px solid var(--border);
+                border-radius: 8px;
+                padding: 16px 18px;
+            }
+            .f-card.critical {
+                border-color: var(--accent);
+            }
+            .f-card .f-num {
+                font-size: 0.62rem;
+                text-transform: uppercase;
+                letter-spacing: 0.12em;
+                color: var(--text-dim);
+                margin-bottom: 6px;
+            }
+            .f-card.critical .f-num {
+                color: var(--accent);
+            }
+            .f-card .f-title {
+                font-size: 1.05rem;
+                font-weight: 700;
+                margin-bottom: 4px;
+            }
+            .f-card .f-desc {
+                font-size: 0.82rem;
+                color: var(--text-dim);
+                line-height: 1.5;
+            }
 
-    /* ── Slide 5: Understanding ── */
-    .hc-def {
-      background: var(--bg-card);
-      border-left: 3px solid var(--accent);
-      padding: 16px 22px;
-      border-radius: 0 8px 8px 0;
-      width: 100%;
-      max-width: 880px;
-      margin: 14px 0;
-    }
-    .hc-def .hc-label {
-      font-size: 0.62rem;
-      text-transform: uppercase;
-      letter-spacing: 0.14em;
-      color: var(--accent);
-      margin-bottom: 6px;
-    }
-    .hc-def .hc-text {
-      font-size: 1.05rem;
-      line-height: 1.5;
-    }
-    .hc-def .hc-sub {
-      font-size: 0.8rem;
-      color: var(--text-dim);
-      margin-top: 6px;
-      line-height: 1.5;
-    }
-    .shift-arrow {
-      text-align: center;
-      font-size: 1rem;
-      color: var(--text-dim);
-      margin-top: 14px;
-    }
-    .shift-arrow .arrow { color: var(--accent); font-size: 1.3rem; margin: 0 10px; }
-    .shift-arrow .after { color: var(--accent); font-weight: 600; }
+            /* ── Slide 5: Understanding ── */
+            .hc-def {
+                background: var(--bg-card);
+                border-left: 3px solid var(--accent);
+                padding: 16px 22px;
+                border-radius: 0 8px 8px 0;
+                width: 100%;
+                max-width: 880px;
+                margin: 14px 0;
+            }
+            .hc-def .hc-label {
+                font-size: 0.62rem;
+                text-transform: uppercase;
+                letter-spacing: 0.14em;
+                color: var(--accent);
+                margin-bottom: 6px;
+            }
+            .hc-def .hc-text {
+                font-size: 1.05rem;
+                line-height: 1.5;
+            }
+            .hc-def .hc-sub {
+                font-size: 0.8rem;
+                color: var(--text-dim);
+                margin-top: 6px;
+                line-height: 1.5;
+            }
+            .shift-arrow {
+                text-align: center;
+                font-size: 1rem;
+                color: var(--text-dim);
+                margin-top: 14px;
+            }
+            .shift-arrow .arrow {
+                color: var(--accent);
+                font-size: 1.3rem;
+                margin: 0 10px;
+            }
+            .shift-arrow .after {
+                color: var(--accent);
+                font-weight: 600;
+            }
 
-    /* ── Slide 6: Manifesto ── */
-    #s6 { background: #000; }
-    #s6 .preamble {
-      font-size: 0.88rem;
-      color: #3a3a4a;
-      text-align: center;
-      max-width: 560px;
-      line-height: 1.7;
-      margin-bottom: 36px;
-    }
-    .manifesto-line {
-      font-size: 2.1rem;
-      font-weight: 700;
-      text-align: center;
-      line-height: 1.4;
-      opacity: 0.12;
-      transition: opacity 0.55s ease;
-      cursor: default;
-    }
-    .manifesto-line.lit { opacity: 1; }
-    #final-line {
-      font-size: 1.1rem;
-      color: var(--text-dim);
-      text-align: center;
-      margin-top: 36px;
-      line-height: 1.65;
-      opacity: 0;
-      transition: opacity 0.8s ease;
-      max-width: 520px;
-    }
-    #final-line strong { color: var(--accent); }
-    #final-line.lit { opacity: 1; }
+            /* ── Slide 6: Manifesto ── */
+            #s6 {
+                background: #000;
+            }
+            #s6 .preamble {
+                font-size: 0.88rem;
+                color: #3a3a4a;
+                text-align: center;
+                max-width: 560px;
+                line-height: 1.7;
+                margin-bottom: 36px;
+            }
+            .manifesto-line {
+                font-size: 2.1rem;
+                font-weight: 700;
+                text-align: center;
+                line-height: 1.4;
+                opacity: 0.12;
+                transition: opacity 0.55s ease;
+                cursor: default;
+            }
+            .manifesto-line.lit {
+                opacity: 1;
+            }
+            #final-line {
+                font-size: 1.1rem;
+                color: var(--text-dim);
+                text-align: center;
+                margin-top: 36px;
+                line-height: 1.65;
+                opacity: 0;
+                transition: opacity 0.8s ease;
+                max-width: 520px;
+            }
+            #final-line strong {
+                color: var(--accent);
+            }
+            #final-line.lit {
+                opacity: 1;
+            }
 
-    /* ── Title accent panel ──────────────────────────────────── */
-    .title-accent {
-      position: absolute; right: 0; top: 0; bottom: 0;
-      width: 34%;
-      background: linear-gradient(135deg, rgba(245,158,11,0.07), rgba(96,165,250,0.04));
-      border-left: 1px solid rgba(245,158,11,0.1);
-      pointer-events: none;
-      overflow: hidden;
-    }
-    .title-accent::before {
-      content: '';
-      position: absolute; inset: -20%;
-      background: repeating-linear-gradient(
-        45deg, transparent, transparent 24px,
-        rgba(245,158,11,0.035) 24px, rgba(245,158,11,0.035) 25px
-      );
-    }
+            /* ── Title accent panel ──────────────────────────────────── */
+            .title-accent {
+                position: absolute;
+                right: 0;
+                top: 0;
+                bottom: 0;
+                width: 34%;
+                background: linear-gradient(
+                    135deg,
+                    rgba(245, 158, 11, 0.07),
+                    rgba(96, 165, 250, 0.04)
+                );
+                border-left: 1px solid rgba(245, 158, 11, 0.1);
+                pointer-events: none;
+                overflow: hidden;
+            }
+            .title-accent::before {
+                content: "";
+                position: absolute;
+                inset: -20%;
+                background: repeating-linear-gradient(
+                    45deg,
+                    transparent,
+                    transparent 24px,
+                    rgba(245, 158, 11, 0.035) 24px,
+                    rgba(245, 158, 11, 0.035) 25px
+                );
+            }
 
-    /* ── Background GIF layer ────────────────────────────────── */
-    .slide-bg {
-      position: absolute; inset: 0;
-      background-size: cover;
-      background-position: center;
-      opacity: 0.09;
-      pointer-events: none;
-      z-index: -1;
-    }
+            /* ── Background GIF layer ────────────────────────────────── */
+            .slide-bg {
+                position: absolute;
+                inset: 0;
+                background-size: cover;
+                background-position: center;
+                opacity: 0.09;
+                pointer-events: none;
+                z-index: -1;
+            }
 
-    /* ── Title h1 ────────────────────────────────────────────── */
-    #s-title h1 {
-      font-size: clamp(2.8rem, 6vw, 5rem);
-      font-weight: 800;
-      line-height: 1.08;
-      letter-spacing: -0.025em;
-      color: #fff;
-      margin: 10px 0 14px;
-    }
+            /* ── Title h1 ────────────────────────────────────────────── */
+            #s-title h1 {
+                font-size: clamp(2.8rem, 6vw, 5rem);
+                font-weight: 800;
+                line-height: 1.08;
+                letter-spacing: -0.025em;
+                color: #fff;
+                margin: 10px 0 14px;
+            }
 
-    /* ── References cards ────────────────────────────────────── */
-    .ref-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 14px 18px;
-    }
-    .ref-card .ref-num {
-      font-size: 0.62rem;
-      text-transform: uppercase;
-      letter-spacing: 0.13em;
-      color: var(--accent);
-      margin-bottom: 5px;
-    }
-    .ref-card .ref-title {
-      font-size: 0.95rem;
-      font-weight: 700;
-      color: #fff;
-      margin-bottom: 4px;
-    }
-    .ref-card .ref-body {
-      font-size: 0.78rem;
-      color: var(--text-dim);
-      line-height: 1.5;
-      margin-bottom: 7px;
-    }
-    .ref-card a {
-      font-size: 0.75rem;
-      color: var(--accent-blue);
-      text-decoration: none;
-    }
-    .author-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 18px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .author-link {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 9px 12px;
-      text-decoration: none;
-      color: var(--text);
-      font-size: 0.82rem;
-      font-weight: 600;
-      transition: border-color 0.2s;
-    }
-    .author-link:hover { border-color: var(--accent); }
-    .author-link .al-label {
-      font-size: 0.65rem;
-      color: var(--text-dim);
-      margin-bottom: 1px;
-    }
-  </style>
-</head>
-<body>
-<div id="app">
-  <div id="deck">
-
-    <!-- ════════════════════════════════
+            /* ── References cards ────────────────────────────────────── */
+            .ref-card {
+                background: var(--bg-card);
+                border: 1px solid var(--border);
+                border-radius: 10px;
+                padding: 14px 18px;
+            }
+            .ref-card .ref-num {
+                font-size: 0.62rem;
+                text-transform: uppercase;
+                letter-spacing: 0.13em;
+                color: var(--accent);
+                margin-bottom: 5px;
+            }
+            .ref-card .ref-title {
+                font-size: 0.95rem;
+                font-weight: 700;
+                color: #fff;
+                margin-bottom: 4px;
+            }
+            .ref-card .ref-body {
+                font-size: 0.78rem;
+                color: var(--text-dim);
+                line-height: 1.5;
+                margin-bottom: 7px;
+            }
+            .ref-card a {
+                font-size: 0.75rem;
+                color: var(--accent-blue);
+                text-decoration: none;
+            }
+            .author-card {
+                background: var(--bg-card);
+                border: 1px solid var(--border);
+                border-radius: 10px;
+                padding: 18px;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+            .author-link {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                background: var(--bg);
+                border: 1px solid var(--border);
+                border-radius: 8px;
+                padding: 9px 12px;
+                text-decoration: none;
+                color: var(--text);
+                font-size: 0.82rem;
+                font-weight: 600;
+                transition: border-color 0.2s;
+            }
+            .author-link:hover {
+                border-color: var(--accent);
+            }
+            .author-link .al-label {
+                font-size: 0.65rem;
+                color: var(--text-dim);
+                margin-bottom: 1px;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="app">
+            <div id="deck">
+                <!-- ════════════════════════════════
          SLIDE 0 — Title
     ════════════════════════════════ -->
-    <div class="slide active" id="s-title"
-         data-notes="No preamble needed — the title does the work. Let the room read it. Start talking when they look back up.">
-      <div class="slide-bg" style="background-image:url('images/1_AQiVwBSQgmBiS2B_HayCiw.gif')"></div>
-      <div class="title-accent"></div>
-      <div class="eyebrow">Presentation &nbsp;·&nbsp; April 2026</div>
-      <h1>Burning Down<br/>the <span style="color:var(--accent);">SDLC</span></h1>
-      <p style="font-size:clamp(1rem,2vw,1.35rem); color:var(--text-dim); line-height:1.55; margin-bottom:14px;">
-        The AI Software Factory<br/>
-        <span style="font-size:0.9em;">Machine-Generated Code and the New Engineering Paradigm</span>
-      </p>
-      <p style="font-size:0.78rem; color:var(--border); letter-spacing:0.08em;">
-        <span style="color:var(--accent); font-weight:700;">SDLC</span> &nbsp;·&nbsp; Software Delivery Life Cycle &nbsp;·&nbsp; 2026-04-11
-      </p>
-    </div>
+                <div
+                    class="slide active"
+                    id="s-title"
+                    data-notes="No preamble needed — the title does the work. Let the room read it. Start talking when they look back up."
+                >
+                    <div
+                        class="slide-bg"
+                        style="
+                            background-image: url(&quot;images/1_AQiVwBSQgmBiS2B_HayCiw.gif&quot;);
+                        "
+                    ></div>
+                    <div class="title-accent"></div>
+                    <div class="eyebrow">
+                        Presentation &nbsp;·&nbsp; April 2026
+                    </div>
+                    <h1>
+                        Burning Down<br />the
+                        <span style="color: var(--accent)">SDLC</span>
+                    </h1>
+                    <p
+                        style="
+                            font-size: clamp(1rem, 2vw, 1.35rem);
+                            color: var(--text-dim);
+                            line-height: 1.55;
+                            margin-bottom: 14px;
+                        "
+                    >
+                        The AI Software Factory<br />
+                        <span style="font-size: 0.9em"
+                            >Machine-Generated Code and the New Engineering
+                            Paradigm</span
+                        >
+                    </p>
+                    <p
+                        style="
+                            font-size: 0.78rem;
+                            color: var(--border);
+                            letter-spacing: 0.08em;
+                        "
+                    >
+                        <span style="color: var(--accent); font-weight: 700"
+                            >SDLC</span
+                        >
+                        &nbsp;·&nbsp; Software Delivery Life Cycle &nbsp;·&nbsp;
+                        2026-04-11
+                    </p>
+                </div>
 
-    <!-- ════════════════════════════════
+                <!-- ════════════════════════════════
          SLIDE 1 — Opening Hook
     ════════════════════════════════ -->
-    <div class="slide" id="s1"
-         data-notes="No bio slide — start talking immediately. Pause after the quote. Let it land before moving on. The last two lines should feel like a gut-punch."
-         data-timing="0:00 – 0:30">
-      <div class="timing">0:00 – 0:30</div>
-      <div style="max-width:820px; width:100%;">
-        <div class="eyebrow">AI Software Factories</div>
-        <blockquote>
-          "AI didn't introduce new problems to software development. The problems have always been here — ambiguous specs, late defect discovery, review bottlenecks, code no one really understands."
-        </blockquote>
-        <div class="hook-bottom">
-          <span class="boring">At human coding speed, those were <em>annoying</em>.</span>
-        </div>
-        <div style="margin-top:10px;">
-          <span style="font-size:1.55rem; font-weight:700;">At AI speed, they are <span style="color:var(--accent);">existential.</span></span>
-        </div>
-      </div>
-    </div>
+                <div
+                    class="slide"
+                    id="s1"
+                    data-notes="No bio slide — start talking immediately. Pause after the quote. Let it land before moving on. The last two lines should feel like a gut-punch."
+                    data-timing="0:00 – 0:30"
+                >
+                    <div class="timing">0:00 – 0:30</div>
+                    <div style="max-width: 820px; width: 100%">
+                        <div class="eyebrow">AI Software Factories</div>
+                        <blockquote>
+                            "AI didn't introduce new problems to software
+                            development. The problems have always been here —
+                            ambiguous specs, late defect discovery, review
+                            bottlenecks, code no one really understands."
+                        </blockquote>
+                        <div class="hook-bottom">
+                            <span class="boring"
+                                >At human coding speed, those were
+                                <em>annoying</em>.</span
+                            >
+                        </div>
+                        <div style="margin-top: 10px">
+                            <span style="font-size: 1.55rem; font-weight: 700"
+                                >At AI speed, they are
+                                <span style="color: var(--accent)"
+                                    >existential.</span
+                                ></span
+                            >
+                        </div>
+                    </div>
+                </div>
 
-    <!-- ════════════════════════════════
+                <!-- ════════════════════════════════
          SLIDE 2 — The SDLC Is Cracking
     ════════════════════════════════ -->
-    <div class="slide" id="s2"
-         data-notes="Evidence first — make the problem visceral before diagnosing it. The open-source PR refusal is real and recognizable. Pause before 'Going back is not a strategy.' Rhetorical beat."
-         data-timing="0:30 – 2:00">
-      <div class="timing">0:30 – 2:00</div>
-      <div style="max-width:940px; width:100%;">
-        <h2>The SDLC Is Cracking</h2>
-        <p class="subtitle">Evidence first, then diagnosis.</p>
+                <div
+                    class="slide"
+                    id="s2"
+                    data-notes="Evidence first — make the problem visceral before diagnosing it. The open-source PR refusal is real and recognizable. Pause before 'Going back is not a strategy.' Rhetorical beat."
+                    data-timing="0:30 – 2:00"
+                >
+                    <div class="timing">0:30 – 2:00</div>
+                    <div style="max-width: 940px; width: 100%">
+                        <h2>The SDLC Is Cracking</h2>
+                        <p class="subtitle">Evidence first, then diagnosis.</p>
 
-        <div class="two-col" style="margin-top:24px;">
-          <div>
-            <div class="col-label">What's happening</div>
-            <ul>
-              <li>Open source maintainers are <strong>refusing AI-generated PRs</strong> — review volume has outpaced human bandwidth</li>
-              <li>Engineering orgs shipping code <strong>no one fully understands</strong> — reaching production</li>
-              <li>AWS production failures traced to <strong>poorly understood generated code</strong></li>
-            </ul>
-          </div>
-          <div>
-            <div class="col-label">The diagnosis</div>
-            <ul>
-              <li>AI is <strong>not introducing</strong> new problems</li>
-              <li>AI is a <strong>multiplier</strong> — it takes every latent dysfunction in your SDLC and turns the dial to 11</li>
-              <li>Going back is <strong>not a strategy</strong></li>
-            </ul>
-            <div style="margin-top:16px;" class="pull-quote">
-              The question is: <strong>what does the SDLC need to become?</strong>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+                        <div class="two-col" style="margin-top: 24px">
+                            <div>
+                                <div class="col-label">What's happening</div>
+                                <ul>
+                                    <li>
+                                        Open source maintainers are
+                                        <strong
+                                            >refusing AI-generated PRs</strong
+                                        >
+                                        — review volume has outpaced human
+                                        bandwidth
+                                    </li>
+                                    <li>
+                                        Engineering orgs shipping code
+                                        <strong
+                                            >no one fully understands</strong
+                                        >
+                                        — reaching production
+                                    </li>
+                                    <li>
+                                        AWS production failures traced to
+                                        <strong
+                                            >poorly understood generated
+                                            code</strong
+                                        >
+                                    </li>
+                                </ul>
+                            </div>
+                            <div>
+                                <div class="col-label">The diagnosis</div>
+                                <ul>
+                                    <li>
+                                        AI is
+                                        <strong>not introducing</strong> new
+                                        problems
+                                    </li>
+                                    <li>
+                                        AI is a <strong>multiplier</strong> — it
+                                        takes every latent dysfunction in your
+                                        SDLC and turns the dial to 11
+                                    </li>
+                                    <li>
+                                        Going back is
+                                        <strong>not a strategy</strong>
+                                    </li>
+                                </ul>
+                                <div
+                                    style="margin-top: 16px"
+                                    class="pull-quote"
+                                >
+                                    The question is:
+                                    <strong
+                                        >what does the SDLC need to
+                                        become?</strong
+                                    >
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-    <!-- ════════════════════════════════
+                <!-- ════════════════════════════════
          SLIDE 3 — The Barbell Effect
     ════════════════════════════════ -->
-    <div class="slide" id="s3"
-         data-notes="Let the barbell diagram do the work — point to each section. Emphasize 'most teams are not staffed or tooled for that.' The closing quote is the one-liner they'll screenshot."
-         data-timing="2:00 – 3:30">
-      <div class="timing">2:00 – 3:30</div>
-      <div style="max-width:940px; width:100%;">
-        <h2>The Barbell Effect</h2>
-        <p class="subtitle">The structural rebalance no one planned for.</p>
+                <div
+                    class="slide"
+                    id="s3"
+                    data-notes="Let the barbell diagram do the work — point to each section. Emphasize 'most teams are not staffed or tooled for that.' The closing quote is the one-liner they'll screenshot."
+                    data-timing="2:00 – 3:30"
+                >
+                    <div class="timing">2:00 – 3:30</div>
+                    <div style="max-width: 940px; width: 100%">
+                        <h2>The Barbell Effect</h2>
+                        <p class="subtitle">
+                            The structural rebalance no one planned for.
+                        </p>
 
-        <!-- Barbell SVG -->
-        <div class="barbell-wrap">
-          <svg viewBox="0 0 880 190" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;">
-            <!-- Connecting bar -->
-            <rect x="155" y="88" width="570" height="12" fill="#1e1e30" rx="6"/>
+                        <!-- Barbell SVG -->
+                        <div class="barbell-wrap">
+                            <svg
+                                viewBox="0 0 880 190"
+                                xmlns="http://www.w3.org/2000/svg"
+                                style="width: 100%; display: block"
+                            >
+                                <!-- Connecting bar -->
+                                <rect
+                                    x="155"
+                                    y="88"
+                                    width="570"
+                                    height="12"
+                                    fill="#1e1e30"
+                                    rx="6"
+                                />
 
-            <!-- Left weight — Planning (EXPANDS) -->
-            <rect x="10" y="22" width="160" height="146" rx="10" fill="#111a28" stroke="#60a5fa" stroke-width="1.5"/>
-            <text x="90" y="74" text-anchor="middle" fill="#60a5fa" font-size="11" font-family="system-ui" font-weight="700" letter-spacing="0.08em">RESEARCH /</text>
-            <text x="90" y="91" text-anchor="middle" fill="#60a5fa" font-size="11" font-family="system-ui" font-weight="700" letter-spacing="0.08em">PLANNING</text>
-            <text x="90" y="118" text-anchor="middle" fill="#60a5fa" font-size="28" font-family="system-ui">↑</text>
-            <text x="90" y="145" text-anchor="middle" fill="#60a5fa" font-size="9.5" font-family="system-ui">EXPANDS</text>
+                                <!-- Left weight — Planning (EXPANDS) -->
+                                <rect
+                                    x="10"
+                                    y="22"
+                                    width="160"
+                                    height="146"
+                                    rx="10"
+                                    fill="#111a28"
+                                    stroke="#60a5fa"
+                                    stroke-width="1.5"
+                                />
+                                <text
+                                    x="90"
+                                    y="74"
+                                    text-anchor="middle"
+                                    fill="#60a5fa"
+                                    font-size="11"
+                                    font-family="system-ui"
+                                    font-weight="700"
+                                    letter-spacing="0.08em"
+                                >
+                                    RESEARCH /
+                                </text>
+                                <text
+                                    x="90"
+                                    y="91"
+                                    text-anchor="middle"
+                                    fill="#60a5fa"
+                                    font-size="11"
+                                    font-family="system-ui"
+                                    font-weight="700"
+                                    letter-spacing="0.08em"
+                                >
+                                    PLANNING
+                                </text>
+                                <text
+                                    x="90"
+                                    y="118"
+                                    text-anchor="middle"
+                                    fill="#60a5fa"
+                                    font-size="28"
+                                    font-family="system-ui"
+                                >
+                                    ↑
+                                </text>
+                                <text
+                                    x="90"
+                                    y="145"
+                                    text-anchor="middle"
+                                    fill="#60a5fa"
+                                    font-size="9.5"
+                                    font-family="system-ui"
+                                >
+                                    EXPANDS
+                                </text>
 
-            <!-- Middle weight — Coding (COLLAPSES) -->
-            <rect x="355" y="65" width="170" height="60" rx="8" fill="#111115" stroke="#2a2a3a" stroke-width="1.5"/>
-            <text x="440" y="91" text-anchor="middle" fill="#4b5563" font-size="11" font-family="system-ui" font-weight="600" letter-spacing="0.08em">CODING</text>
-            <text x="440" y="112" text-anchor="middle" fill="#374151" font-size="9.5" font-family="system-ui">collapses ↓</text>
+                                <!-- Middle weight — Coding (COLLAPSES) -->
+                                <rect
+                                    x="355"
+                                    y="65"
+                                    width="170"
+                                    height="60"
+                                    rx="8"
+                                    fill="#111115"
+                                    stroke="#2a2a3a"
+                                    stroke-width="1.5"
+                                />
+                                <text
+                                    x="440"
+                                    y="91"
+                                    text-anchor="middle"
+                                    fill="#4b5563"
+                                    font-size="11"
+                                    font-family="system-ui"
+                                    font-weight="600"
+                                    letter-spacing="0.08em"
+                                >
+                                    CODING
+                                </text>
+                                <text
+                                    x="440"
+                                    y="112"
+                                    text-anchor="middle"
+                                    fill="#374151"
+                                    font-size="9.5"
+                                    font-family="system-ui"
+                                >
+                                    collapses ↓
+                                </text>
 
-            <!-- Right weight — Validation (EXPANDS) -->
-            <rect x="710" y="22" width="160" height="146" rx="10" fill="#111e18" stroke="#34d399" stroke-width="1.5"/>
-            <text x="790" y="82" text-anchor="middle" fill="#34d399" font-size="11" font-family="system-ui" font-weight="700" letter-spacing="0.08em">VALIDATION</text>
-            <text x="790" y="118" text-anchor="middle" fill="#34d399" font-size="28" font-family="system-ui">↑</text>
-            <text x="790" y="145" text-anchor="middle" fill="#34d399" font-size="9.5" font-family="system-ui">EXPANDS</text>
-          </svg>
-        </div>
+                                <!-- Right weight — Validation (EXPANDS) -->
+                                <rect
+                                    x="710"
+                                    y="22"
+                                    width="160"
+                                    height="146"
+                                    rx="10"
+                                    fill="#111e18"
+                                    stroke="#34d399"
+                                    stroke-width="1.5"
+                                />
+                                <text
+                                    x="790"
+                                    y="82"
+                                    text-anchor="middle"
+                                    fill="#34d399"
+                                    font-size="11"
+                                    font-family="system-ui"
+                                    font-weight="700"
+                                    letter-spacing="0.08em"
+                                >
+                                    VALIDATION
+                                </text>
+                                <text
+                                    x="790"
+                                    y="118"
+                                    text-anchor="middle"
+                                    fill="#34d399"
+                                    font-size="28"
+                                    font-family="system-ui"
+                                >
+                                    ↑
+                                </text>
+                                <text
+                                    x="790"
+                                    y="145"
+                                    text-anchor="middle"
+                                    fill="#34d399"
+                                    font-size="9.5"
+                                    font-family="system-ui"
+                                >
+                                    EXPANDS
+                                </text>
+                            </svg>
+                        </div>
 
-        <div class="two-col" style="gap:32px;">
-          <div>
-            <div class="col-label" style="color:var(--accent-blue);">Left expands — Planning</div>
-            <ul>
-              <li>Specs rigorous enough for a <strong>machine to act on</strong></li>
-              <li>Problem definition, decomposition, risk modeling, test design — now <strong>primary</strong> engineering work</li>
-            </ul>
-          </div>
-          <div>
-            <div class="col-label" style="color:var(--accent-green);">Right expands — Validation</div>
-            <ul>
-              <li>Automated testing, behavioral validation, observability, canary releases</li>
-              <li>The <strong>verification layer</strong> is what makes the factory safe</li>
-            </ul>
-          </div>
-        </div>
+                        <div class="two-col" style="gap: 32px">
+                            <div>
+                                <div
+                                    class="col-label"
+                                    style="color: var(--accent-blue)"
+                                >
+                                    Left expands — Planning
+                                </div>
+                                <ul>
+                                    <li>
+                                        Specs rigorous enough for a
+                                        <strong>machine to act on</strong>
+                                    </li>
+                                    <li>
+                                        Problem definition, decomposition, risk
+                                        modeling, test design — now
+                                        <strong>primary</strong> engineering
+                                        work
+                                    </li>
+                                </ul>
+                            </div>
+                            <div>
+                                <div
+                                    class="col-label"
+                                    style="color: var(--accent-green)"
+                                >
+                                    Right expands — Validation
+                                </div>
+                                <ul>
+                                    <li>
+                                        Automated testing, behavioral
+                                        validation, observability, canary
+                                        releases
+                                    </li>
+                                    <li>
+                                        The
+                                        <strong>verification layer</strong> is
+                                        what makes the factory safe
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
 
-        <div style="text-align:center; margin-top:16px; font-size:1.05rem; color:var(--accent); font-style:italic;">
-          "Iteration is cheap. Correctness is still hard."
-        </div>
-      </div>
-    </div>
+                        <div
+                            style="
+                                text-align: center;
+                                margin-top: 16px;
+                                font-size: 1.05rem;
+                                color: var(--accent);
+                                font-style: italic;
+                            "
+                        >
+                            "Iteration is cheap. Correctness is still hard."
+                        </div>
+                    </div>
+                </div>
 
-    <!-- ════════════════════════════════
+                <!-- ════════════════════════════════
          SLIDE 4 — The Factory
     ════════════════════════════════ -->
-    <div class="slide" id="s4"
-         data-notes="Let the image speak first. Then: 'Software development is the transformation of intent into verified behavior.' Pause on the 'fix the die' line."
-         data-timing="3:30 – 5:30">
-      <div class="timing">3:30 – 5:30</div>
-      <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; width:100%; gap:18px;">
-        <img src="images/Gemini_Generated_Image_c86xfjc86xfjc86x.png"
-             alt="The Factory"
-             style="max-height:78vh; max-width:92vw; object-fit:contain; border-radius:8px;"/>
-      </div>
-    </div>
+                <div
+                    class="slide"
+                    id="s4"
+                    data-notes="Let the image speak first. Then: 'Software development is the transformation of intent into verified behavior.' Pause on the 'fix the die' line."
+                    data-timing="3:30 – 5:30"
+                >
+                    <div class="timing">3:30 – 5:30</div>
+                    <div
+                        style="
+                            display: flex;
+                            flex-direction: column;
+                            align-items: center;
+                            justify-content: center;
+                            height: 100%;
+                            width: 100%;
+                            gap: 18px;
+                        "
+                    >
+                        <img
+                            src="images/Gemini_Generated_Image_c86xfjc86xfjc86x.png"
+                            alt="The Factory"
+                            style="
+                                max-height: 78vh;
+                                max-width: 92vw;
+                                object-fit: contain;
+                                border-radius: 8px;
+                            "
+                        />
+                    </div>
+                </div>
 
-    <!-- ════════════════════════════════
+                <!-- ════════════════════════════════
          SLIDE 5 — The Understanding Layer
     ════════════════════════════════ -->
-    <div class="slide" id="s5"
-         data-notes="Human Coverage is the photo-worthy slide — slow down here. The definition should be said out loud clearly. Software Biologist: sell the behavior, not the label. End with the shift arrow as a through-line to the close."
-         data-timing="5:30 – 7:00">
-      <div class="timing">5:30 – 7:00</div>
-      <div style="max-width:920px; width:100%;">
-        <h2>The Understanding Layer</h2>
-        <p class="subtitle">The constraint no one is talking about.</p>
+                <div
+                    class="slide"
+                    id="s5"
+                    data-notes="Human Coverage is the photo-worthy slide — slow down here. The definition should be said out loud clearly. Software Biologist: sell the behavior, not the label. End with the shift arrow as a through-line to the close."
+                    data-timing="5:30 – 7:00"
+                >
+                    <div class="timing">5:30 – 7:00</div>
+                    <div style="max-width: 920px; width: 100%">
+                        <h2>The Understanding Layer</h2>
+                        <p class="subtitle">
+                            The constraint no one is talking about.
+                        </p>
 
-        <p style="margin:12px 0; font-size:0.95rem; color:var(--text-dim); line-height:1.6;">
-          We are shipping code <strong>faster than we understand it</strong>. Iteration is cheap. Correctness is hard.
-          But there is a <strong>third constraint</strong>: <span style="color:var(--accent);">comprehension</span>.
-        </p>
+                        <p
+                            style="
+                                margin: 12px 0;
+                                font-size: 0.95rem;
+                                color: var(--text-dim);
+                                line-height: 1.6;
+                            "
+                        >
+                            We are shipping code
+                            <strong>faster than we understand it</strong>.
+                            Iteration is cheap. Correctness is hard. But there
+                            is a <strong>third constraint</strong>:
+                            <span style="color: var(--accent)"
+                                >comprehension</span
+                            >.
+                        </p>
 
-        <div class="hc-def">
-          <div class="hc-label">Human Coverage — the metric that matters</div>
-          <div class="hc-text"><strong>% of your codebase requiring active human understanding due to risk and blast radius</strong></div>
-          <div class="hc-sub">
-            Security paths &nbsp;·&nbsp; Billing logic &nbsp;·&nbsp; Cross-system integrations &nbsp;·&nbsp; Ambiguous intent<br/>
-            Flag these at <strong>planning time</strong> — not incident time.
-          </div>
-        </div>
+                        <div class="hc-def">
+                            <div class="hc-label">
+                                Human Coverage — the metric that matters
+                            </div>
+                            <div class="hc-text">
+                                <strong
+                                    >% of your codebase requiring active human
+                                    understanding due to risk and blast
+                                    radius</strong
+                                >
+                            </div>
+                            <div class="hc-sub">
+                                Security paths &nbsp;·&nbsp; Billing logic
+                                &nbsp;·&nbsp; Cross-system integrations
+                                &nbsp;·&nbsp; Ambiguous intent<br />
+                                Flag these at <strong>planning time</strong> —
+                                not incident time.
+                            </div>
+                        </div>
 
-        <div class="two-col" style="gap:32px; margin-top:0;">
-          <div>
-            <div class="col-label">The Software Biologist</div>
-            <ul>
-              <li><strong>Observe</strong> the system — don't just read source code</li>
-              <li>Trace paths, run chaos, read telemetry, rehearse failures</li>
-              <li>Like a biologist: watch what happens; don't sequence every organism</li>
-            </ul>
-          </div>
-          <div>
-            <div class="col-label">With AI agents</div>
-            <ul>
-              <li>Give agents direct access to your observability stack</li>
-              <li>Logs · Metrics · Traces · Alerts</li>
-              <li><strong>Five tools and 40 minutes</strong> → one conversation</li>
-            </ul>
-          </div>
-        </div>
+                        <div class="two-col" style="gap: 32px; margin-top: 0">
+                            <div>
+                                <div class="col-label">
+                                    The Software Biologist
+                                </div>
+                                <ul>
+                                    <li>
+                                        <strong>Observe</strong> the system —
+                                        don't just read source code
+                                    </li>
+                                    <li>
+                                        Trace paths, run chaos, read telemetry,
+                                        rehearse failures
+                                    </li>
+                                    <li>
+                                        Like a biologist: conduct research,
+                                        analyze data, and perform experiment
+                                    </li>
+                                </ul>
+                            </div>
+                            <div>
+                                <div class="col-label">With AI agents</div>
+                                <ul>
+                                    <li>
+                                        Give agents direct access to your
+                                        observability stack
+                                    </li>
+                                    <li>Logs · Metrics · Traces · Alerts</li>
+                                    <li>
+                                        <strong
+                                            >Five tools and 40 minutes</strong
+                                        >
+                                        → one conversation
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
 
-        <div class="shift-arrow">
-          <span>building systems</span>
-          <span class="arrow">→</span>
-          <span class="after">understanding systems continuously</span>
-        </div>
-      </div>
-    </div>
+                        <div class="shift-arrow">
+                            <span>building systems</span>
+                            <span class="arrow">→</span>
+                            <span class="after"
+                                >understanding systems continuously</span
+                            >
+                        </div>
+                    </div>
+                </div>
 
-    <!-- ════════════════════════════════
+                <!-- ════════════════════════════════
          SLIDE 6 — Close / Manifesto
     ════════════════════════════════ -->
-    <div class="slide" id="s6"
-         data-notes="Slow down. Click to reveal each line. Each line gets a full breath. The final principle is the last thing they hear — don't rush it. Let silence do the work."
-         data-timing="7:00 – 8:00">
-      <div class="timing" style="color:#222;">7:00 – 8:00</div>
-      <p class="preamble" style="color:#c9c9c9;">
-        The SDLC was built for one constraint: <em style="color:#fff; font-style:italic;">humans are slow at writing code</em>.<br/>
-        That constraint is gone. The system hasn't adapted — yet.
-      </p>
-      <div id="manifesto">
-        <div class="manifesto-line" id="m1">Test what can be tested.</div>
-        <div class="manifesto-line" id="m2">Measure what can be measured.</div>
-        <div class="manifesto-line" id="m3">Simulate what must be explored.</div>
-        <div class="manifesto-line" id="m4">Own everything.</div>
-      </div>
-      <div id="final-line">
-        Engineering success is no longer <em>"we shipped it."</em><br/>
-        It is: <strong>"We understand it — continuously."</strong>
-      </div>
-    </div>
+                <div
+                    class="slide"
+                    id="s6"
+                    data-notes="Slow down. Click to reveal each line. Each line gets a full breath. The final principle is the last thing they hear — don't rush it. Let silence do the work."
+                    data-timing="7:00 – 8:00"
+                >
+                    <div class="timing" style="color: #222">7:00 – 8:00</div>
+                    <p class="preamble" style="color: #c9c9c9">
+                        The SDLC was built for one constraint:
+                        <em style="color: #fff; font-style: italic"
+                            >humans are slow at writing code</em
+                        >.<br />
+                        That constraint is gone. The system hasn't adapted —
+                        yet.
+                    </p>
+                    <div id="manifesto">
+                        <div class="manifesto-line" id="m1">
+                            Test what can be tested.
+                        </div>
+                        <div class="manifesto-line" id="m2">
+                            Measure what can be measured.
+                        </div>
+                        <div class="manifesto-line" id="m3">
+                            Simulate what must be explored.
+                        </div>
+                        <div class="manifesto-line" id="m4">
+                            Own everything.
+                        </div>
+                    </div>
+                    <div id="final-line">
+                        Engineering success is no longer
+                        <em>"we shipped it."</em><br />
+                        It is:
+                        <strong>"We understand it — continuously."</strong>
+                    </div>
+                </div>
 
-    <!-- ════════════════════════════════
+                <!-- ════════════════════════════════
          SLIDE — References
     ════════════════════════════════ -->
-    <div class="slide" id="s-refs"
-         data-notes="Leave this up during Q&A. The three references are the primary reading — Simon Willison's StrongDM piece is the most concrete real-world example of the factory in production.">
-      <div class="slide-bg" style="background-image:url('images/1_ZFVRe4UaVhquOz5CP0RDIg.gif')"></div>
-      <div style="max-width:940px; width:100%;">
-        <div class="eyebrow">Further Reading</div>
-        <h2 style="margin-bottom:18px;">References</h2>
+                <div
+                    class="slide"
+                    id="s-refs"
+                    data-notes="Leave this up during Q&A. The three references are the primary reading — Simon Willison's StrongDM piece is the most concrete real-world example of the factory in production."
+                >
+                    <div
+                        class="slide-bg"
+                        style="
+                            background-image: url(&quot;images/1_ZFVRe4UaVhquOz5CP0RDIg.gif&quot;);
+                        "
+                    ></div>
+                    <div style="max-width: 940px; width: 100%">
+                        <div class="eyebrow">Further Reading</div>
+                        <h2 style="margin-bottom: 18px">References</h2>
 
-        <div style="display:grid; grid-template-columns:1fr 260px; gap:16px; align-items:start;">
+                        <div
+                            style="
+                                display: grid;
+                                grid-template-columns: 1fr 260px;
+                                gap: 16px;
+                                align-items: start;
+                            "
+                        >
+                            <div
+                                style="
+                                    display: flex;
+                                    flex-direction: column;
+                                    gap: 12px;
+                                "
+                            >
+                                <div class="ref-card">
+                                    <div class="ref-num">
+                                        01 · Geoffrey Huntley
+                                    </div>
+                                    <div class="ref-title">
+                                        Ralph Wiggum as a "software engineer"
+                                    </div>
+                                    <div class="ref-body">
+                                        Describes the Ralph technique: running
+                                        an LLM coding agent in a repeating bash
+                                        loop to autonomously execute software
+                                        development tasks.
+                                    </div>
+                                    <a
+                                        href="https://ghuntley.com/ralph/"
+                                        target="_blank"
+                                        >ghuntley.com/ralph/ ↗</a
+                                    >
+                                </div>
+                                <div class="ref-card">
+                                    <div class="ref-num">02 · Steve Yegge</div>
+                                    <div class="ref-title">
+                                        Welcome to Gas Town
+                                    </div>
+                                    <div class="ref-body">
+                                        Introduces Gas Town — an orchestration
+                                        system for running multiple Claude Code
+                                        instances that automates complex
+                                        workflows via persistent agent
+                                        identities and a Git-backed data plane.
+                                    </div>
+                                    <a
+                                        href="https://steve-yegge.medium.com/welcome-to-gas-town-4f25ee16dd04"
+                                        target="_blank"
+                                        >steve-yegge.medium.com ↗</a
+                                    >
+                                </div>
+                                <div class="ref-card">
+                                    <div class="ref-num">
+                                        03 · Simon Willison
+                                    </div>
+                                    <div class="ref-title">
+                                        How StrongDM's AI team build serious
+                                        software without even looking at the
+                                        code
+                                    </div>
+                                    <div class="ref-body">
+                                        StrongDM's AI coding agents build
+                                        production software end-to-end — without
+                                        engineers reviewing the code — validated
+                                        by comprehensive scenario tests and
+                                        "Digital Twin Universe" clones of
+                                        external services.
+                                    </div>
+                                    <a
+                                        href="https://simonwillison.net/2026/Feb/7/software-factory/"
+                                        target="_blank"
+                                        >simonwillison.net ↗</a
+                                    >
+                                </div>
+                            </div>
 
-          <div style="display:flex; flex-direction:column; gap:12px;">
-            <div class="ref-card">
-              <div class="ref-num">01 · Geoffrey Huntley</div>
-              <div class="ref-title">Ralph Wiggum as a "software engineer"</div>
-              <div class="ref-body">Describes the Ralph technique: running an LLM coding agent in a repeating bash loop to autonomously execute software development tasks.</div>
-              <a href="https://ghuntley.com/ralph/" target="_blank">ghuntley.com/ralph/ ↗</a>
-            </div>
-            <div class="ref-card">
-              <div class="ref-num">02 · Steve Yegge</div>
-              <div class="ref-title">Welcome to Gas Town</div>
-              <div class="ref-body">Introduces Gas Town — an orchestration system for running multiple Claude Code instances that automates complex workflows via persistent agent identities and a Git-backed data plane.</div>
-              <a href="https://steve-yegge.medium.com/welcome-to-gas-town-4f25ee16dd04" target="_blank">steve-yegge.medium.com ↗</a>
-            </div>
-            <div class="ref-card">
-              <div class="ref-num">03 · Simon Willison</div>
-              <div class="ref-title">How StrongDM's AI team build serious software without even looking at the code</div>
-              <div class="ref-body">StrongDM's AI coding agents build production software end-to-end — without engineers reviewing the code — validated by comprehensive scenario tests and "Digital Twin Universe" clones of external services.</div>
-              <a href="https://simonwillison.net/2026/Feb/7/software-factory/" target="_blank">simonwillison.net ↗</a>
-            </div>
-          </div>
+                            <div class="author-card">
+                                <div class="col-label">About the Author</div>
+                                <p
+                                    style="
+                                        font-size: 1rem;
+                                        font-weight: 700;
+                                        color: #fff;
+                                    "
+                                >
+                                    Owen Zanzal
+                                </p>
+                                <a
+                                    class="author-link"
+                                    href="https://medium.com/devops-ai"
+                                    target="_blank"
+                                >
+                                    <svg
+                                        width="14"
+                                        height="14"
+                                        viewBox="0 0 24 24"
+                                        fill="currentColor"
+                                        style="
+                                            color: var(--accent);
+                                            flex-shrink: 0;
+                                        "
+                                    >
+                                        <path
+                                            d="M13.54 12a6.8 6.8 0 01-6.77 6.82A6.8 6.8 0 010 12a6.8 6.8 0 016.77-6.82A6.8 6.8 0 0113.54 12zM20.96 12c0 3.54-1.51 6.42-3.38 6.42-1.87 0-3.39-2.88-3.39-6.42s1.52-6.42 3.39-6.42 3.38 2.88 3.38 6.42M24 12c0 3.17-.53 5.75-1.19 5.75-.66 0-1.19-2.58-1.19-5.75s.53-5.75 1.19-5.75C23.47 6.25 24 8.83 24 12z"
+                                        />
+                                    </svg>
+                                    <div>
+                                        <div class="al-label">Blog</div>
+                                        medium.com/devops-ai
+                                    </div>
+                                </a>
+                                <a
+                                    class="author-link"
+                                    href="https://www.linkedin.com/in/owenzanzal/"
+                                    target="_blank"
+                                >
+                                    <svg
+                                        width="14"
+                                        height="14"
+                                        viewBox="0 0 24 24"
+                                        fill="currentColor"
+                                        style="
+                                            color: var(--accent-blue);
+                                            flex-shrink: 0;
+                                        "
+                                    >
+                                        <path
+                                            d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"
+                                        />
+                                    </svg>
+                                    <div>
+                                        <div class="al-label">LinkedIn</div>
+                                        linkedin.com/in/owenzanzal
+                                    </div>
+                                </a>
+                                <div
+                                    style="
+                                        border-top: 1px solid var(--border);
+                                        padding-top: 10px;
+                                        margin-top: 4px;
+                                    "
+                                >
+                                    <div
+                                        class="col-label"
+                                        style="margin-bottom: 8px"
+                                    >
+                                        Tools
+                                    </div>
+                                    <a
+                                        class="author-link"
+                                        href="https://openobserve.ai/"
+                                        target="_blank"
+                                        style="margin-bottom: 8px"
+                                    >
+                                        <svg
+                                            width="12"
+                                            height="12"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                            style="
+                                                color: var(--accent-green);
+                                                flex-shrink: 0;
+                                            "
+                                        >
+                                            <circle cx="12" cy="12" r="10" />
+                                            <path d="M12 8v4l3 3" />
+                                        </svg>
+                                        <div>
+                                            <div class="al-label">
+                                                Observability
+                                            </div>
+                                            openobserve.ai
+                                        </div>
+                                    </a>
+                                    <a
+                                        class="author-link"
+                                        href="https://docs.anthropic.com/en/docs/claude-code/overview"
+                                        target="_blank"
+                                    >
+                                        <svg
+                                            width="12"
+                                            height="12"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                            style="
+                                                color: var(--accent);
+                                                flex-shrink: 0;
+                                            "
+                                        >
+                                            <path
+                                                d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"
+                                            />
+                                            <polyline points="14 2 14 8 20 8" />
+                                        </svg>
+                                        <div>
+                                            <div class="al-label">
+                                                Claude Code Docs
+                                            </div>
+                                            docs.anthropic.com
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-          <div class="author-card">
-            <div class="col-label">About the Author</div>
-            <p style="font-size:1rem; font-weight:700; color:#fff;">Owen Zanzal</p>
-            <a class="author-link" href="https://medium.com/devops-ai" target="_blank">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="color:var(--accent);flex-shrink:0"><path d="M13.54 12a6.8 6.8 0 01-6.77 6.82A6.8 6.8 0 010 12a6.8 6.8 0 016.77-6.82A6.8 6.8 0 0113.54 12zM20.96 12c0 3.54-1.51 6.42-3.38 6.42-1.87 0-3.39-2.88-3.39-6.42s1.52-6.42 3.39-6.42 3.38 2.88 3.38 6.42M24 12c0 3.17-.53 5.75-1.19 5.75-.66 0-1.19-2.58-1.19-5.75s.53-5.75 1.19-5.75C23.47 6.25 24 8.83 24 12z"/></svg>
-              <div><div class="al-label">Blog</div>medium.com/devops-ai</div>
-            </a>
-            <a class="author-link" href="https://www.linkedin.com/in/owenzanzal/" target="_blank">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="color:var(--accent-blue);flex-shrink:0"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-              <div><div class="al-label">LinkedIn</div>linkedin.com/in/owenzanzal</div>
-            </a>
-            <div style="border-top:1px solid var(--border); padding-top:10px; margin-top:4px;">
-              <div class="col-label" style="margin-bottom:8px;">Tools</div>
-              <a class="author-link" href="https://openobserve.ai/" target="_blank" style="margin-bottom:8px;">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent-green);flex-shrink:0"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
-                <div><div class="al-label">Observability</div>openobserve.ai</div>
-              </a>
-              <a class="author-link" href="https://docs.anthropic.com/en/docs/claude-code/overview" target="_blank">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent);flex-shrink:0"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                <div><div class="al-label">Claude Code Docs</div>docs.anthropic.com</div>
-              </a>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </div>
-
-    <!-- ════════════════════════════════
+                <!-- ════════════════════════════════
          SLIDE — View Online
     ════════════════════════════════ -->
-    <div class="slide" id="s-qr"
-         data-notes="Leave this up as people leave. Invite them to scan and read the full deck online.">
-      <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; width:100%; gap:28px; text-align:center;">
-        <div class="eyebrow">View Online</div>
-        <a href="https://www.othree.cloud/software-factories/" target="_blank"
-           style="background:#fff; padding:16px; border-radius:12px; display:inline-block; line-height:0;">
-          <img src="images/tqrcg-180426092150.png"
-               alt="QR code — othree.cloud/software-factories"
-               style="width:220px; height:220px; display:block;"/>
-        </a>
-        <a href="https://www.othree.cloud/software-factories/" target="_blank"
-           style="font-size:1.1rem; font-weight:600; color:var(--accent); text-decoration:none; letter-spacing:0.02em;">
-          othree.cloud/software-factories
-        </a>
-        <p style="font-size:0.8rem; color:var(--border);">Scan to open the full slide deck</p>
-      </div>
-    </div>
+                <div
+                    class="slide"
+                    id="s-qr"
+                    data-notes="Leave this up as people leave. Invite them to scan and read the full deck online."
+                >
+                    <div
+                        style="
+                            display: flex;
+                            flex-direction: column;
+                            align-items: center;
+                            justify-content: center;
+                            height: 100%;
+                            width: 100%;
+                            gap: 28px;
+                            text-align: center;
+                        "
+                    >
+                        <div class="eyebrow">View Online</div>
+                        <a
+                            href="https://www.othree.cloud/software-factories/"
+                            target="_blank"
+                            style="
+                                background: #fff;
+                                padding: 16px;
+                                border-radius: 12px;
+                                display: inline-block;
+                                line-height: 0;
+                            "
+                        >
+                            <img
+                                src="images/tqrcg-180426092150.png"
+                                alt="QR code — othree.cloud/software-factories"
+                                style="
+                                    width: 220px;
+                                    height: 220px;
+                                    display: block;
+                                "
+                            />
+                        </a>
+                        <a
+                            href="https://www.othree.cloud/software-factories/"
+                            target="_blank"
+                            style="
+                                font-size: 1.1rem;
+                                font-weight: 600;
+                                color: var(--accent);
+                                text-decoration: none;
+                                letter-spacing: 0.02em;
+                            "
+                        >
+                            othree.cloud/software-factories
+                        </a>
+                        <p style="font-size: 0.8rem; color: var(--border)">
+                            Scan to open the full slide deck
+                        </p>
+                        <a
+                            href="https://github.com/o3-cloud/software-factories"
+                            target="_blank"
+                            style="
+                                font-size: 0.85rem;
+                                color: var(--text-dim);
+                                text-decoration: none;
+                                letter-spacing: 0.02em;
+                            "
+                        >
+                            github.com/o3-cloud/software-factories
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <!-- #deck -->
 
-  </div><!-- #deck -->
+            <!-- Progress -->
+            <div id="progress"><div id="progress-fill"></div></div>
 
-  <!-- Progress -->
-  <div id="progress"><div id="progress-fill"></div></div>
+            <!-- Controls -->
+            <div id="controls">
+                <div class="left">
+                    <span
+                        id="slide-num"
+                        style="font-variant-numeric: tabular-nums"
+                        >1 / 6</span
+                    >
+                    <span id="slide-name" style="color: var(--text-dim)"
+                        >Opening Hook</span
+                    >
+                </div>
+                <div class="right">
+                    <span id="timer" title="Press T to start/stop timer"
+                        >0:00</span
+                    >
+                    <span class="hint"
+                        >← → navigate &nbsp;·&nbsp; N notes &nbsp;·&nbsp; T
+                        timer &nbsp;·&nbsp; F fullscreen</span
+                    >
+                </div>
+            </div>
 
-  <!-- Controls -->
-  <div id="controls">
-    <div class="left">
-      <span id="slide-num" style="font-variant-numeric:tabular-nums;">1 / 6</span>
-      <span id="slide-name" style="color:var(--text-dim);">Opening Hook</span>
-    </div>
-    <div class="right">
-      <span id="timer" title="Press T to start/stop timer">0:00</span>
-      <span class="hint">← → navigate &nbsp;·&nbsp; N notes &nbsp;·&nbsp; T timer &nbsp;·&nbsp; F fullscreen</span>
-    </div>
-  </div>
+            <!-- Notes panel -->
+            <div id="notes-panel">
+                <div id="notes-inner">
+                    <span>Speaker Note</span>
+                    <p id="notes-text"></p>
+                </div>
+            </div>
+        </div>
+        <!-- #app -->
 
-  <!-- Notes panel -->
-  <div id="notes-panel">
-    <div id="notes-inner">
-      <span>Speaker Note</span>
-      <p id="notes-text"></p>
-    </div>
-  </div>
-</div><!-- #app -->
+        <script>
+            const slides = Array.from(document.querySelectorAll(".slide"));
+            const total = slides.length;
+            const progressFill = document.getElementById("progress-fill");
+            const slideNum = document.getElementById("slide-num");
+            const slideName = document.getElementById("slide-name");
+            const timerEl = document.getElementById("timer");
+            const notesPanel = document.getElementById("notes-panel");
+            const notesText = document.getElementById("notes-text");
 
-<script>
-  const slides = Array.from(document.querySelectorAll('.slide'));
-  const total = slides.length;
-  const progressFill = document.getElementById('progress-fill');
-  const slideNum = document.getElementById('slide-num');
-  const slideName = document.getElementById('slide-name');
-  const timerEl = document.getElementById('timer');
-  const notesPanel = document.getElementById('notes-panel');
-  const notesText = document.getElementById('notes-text');
+            let current = 0;
+            let notesOpen = false;
+            let timerRunning = false;
+            let timerStart = null;
+            let timerInterval = null;
 
-  let current = 0;
-  let notesOpen = false;
-  let timerRunning = false;
-  let timerStart = null;
-  let timerInterval = null;
+            // Manifesto reveal
+            const manifestoIds = ["m1", "m2", "m3", "m4"];
+            let mStep = 0;
 
-  // Manifesto reveal
-  const manifestoIds = ['m1','m2','m3','m4'];
-  let mStep = 0;
+            function updateUI() {
+                progressFill.style.width = `${((current + 1) / total) * 100}%`;
+                slideNum.textContent = `${current + 1} / ${total}`;
+                slideName.textContent = slides[current].dataset.notes
+                    ? slides[current].id.replace("s", "") +
+                      " — " +
+                      (slides[current].querySelector("h2")
+                          ? slides[current].querySelector("h2").textContent
+                          : "Opening Hook")
+                    : "Opening Hook";
+                // Derive name from h2 or eyebrow
+                const h2 = slides[current].querySelector("h2");
+                const eyebrow = slides[current].querySelector(".eyebrow");
+                slideName.textContent = h2
+                    ? h2.textContent
+                    : eyebrow
+                      ? eyebrow.textContent
+                      : "";
 
-  function updateUI() {
-    progressFill.style.width = `${((current + 1) / total) * 100}%`;
-    slideNum.textContent = `${current + 1} / ${total}`;
-    slideName.textContent = slides[current].dataset.notes
-      ? slides[current].id.replace('s','') + ' — ' + (slides[current].querySelector('h2') ? slides[current].querySelector('h2').textContent : 'Opening Hook')
-      : 'Opening Hook';
-    // Derive name from h2 or eyebrow
-    const h2 = slides[current].querySelector('h2');
-    const eyebrow = slides[current].querySelector('.eyebrow');
-    slideName.textContent = h2 ? h2.textContent : (eyebrow ? eyebrow.textContent : '');
+                if (notesOpen) {
+                    notesText.textContent = slides[current].dataset.notes || "";
+                }
+            }
 
-    if (notesOpen) {
-      notesText.textContent = slides[current].dataset.notes || '';
-    }
-  }
+            function goTo(idx, dir) {
+                if (idx < 0 || idx >= total) return;
+                const prev = slides[current];
+                const next = slides[idx];
 
-  function goTo(idx, dir) {
-    if (idx < 0 || idx >= total) return;
-    const prev = slides[current];
-    const next = slides[idx];
+                prev.classList.remove("active");
+                prev.classList.add("prev");
+                setTimeout(() => prev.classList.remove("prev"), 400);
 
-    prev.classList.remove('active');
-    prev.classList.add('prev');
-    setTimeout(() => prev.classList.remove('prev'), 400);
+                next.classList.add("active");
+                current = idx;
+                updateUI();
 
-    next.classList.add('active');
-    current = idx;
-    updateUI();
+                // Reset manifesto if navigating away
+                if (current !== 6) resetManifesto();
+            }
 
-    // Reset manifesto if navigating away
-    if (current !== 6) resetManifesto();
-  }
+            function resetManifesto() {
+                mStep = 0;
+                manifestoIds.forEach((id) =>
+                    document.getElementById(id).classList.remove("lit"),
+                );
+                document.getElementById("final-line").classList.remove("lit");
+            }
 
-  function resetManifesto() {
-    mStep = 0;
-    manifestoIds.forEach(id => document.getElementById(id).classList.remove('lit'));
-    document.getElementById('final-line').classList.remove('lit');
-  }
+            function advance() {
+                if (current === 6) {
+                    if (mStep < manifestoIds.length) {
+                        document
+                            .getElementById(manifestoIds[mStep])
+                            .classList.add("lit");
+                        mStep++;
+                        return;
+                    }
+                    if (mStep === manifestoIds.length) {
+                        document
+                            .getElementById("final-line")
+                            .classList.add("lit");
+                        mStep++;
+                        return;
+                    }
+                    // manifesto fully revealed — advance to references
+                }
+                goTo(current + 1, 1);
+            }
 
-  function advance() {
-    if (current === 6) {
-      if (mStep < manifestoIds.length) {
-        document.getElementById(manifestoIds[mStep]).classList.add('lit');
-        mStep++;
-        return;
-      }
-      if (mStep === manifestoIds.length) {
-        document.getElementById('final-line').classList.add('lit');
-        mStep++;
-        return;
-      }
-      // manifesto fully revealed — advance to references
-    }
-    goTo(current + 1, 1);
-  }
+            function retreat() {
+                if (current === 6 && mStep > 0) {
+                    mStep--;
+                    if (mStep === manifestoIds.length) {
+                        document
+                            .getElementById("final-line")
+                            .classList.remove("lit");
+                    } else {
+                        document
+                            .getElementById(manifestoIds[mStep])
+                            .classList.remove("lit");
+                    }
+                    return;
+                }
+                goTo(current - 1, -1);
+            }
 
-  function retreat() {
-    if (current === 6 && mStep > 0) {
-      mStep--;
-      if (mStep === manifestoIds.length) {
-        document.getElementById('final-line').classList.remove('lit');
-      } else {
-        document.getElementById(manifestoIds[mStep]).classList.remove('lit');
-      }
-      return;
-    }
-    goTo(current - 1, -1);
-  }
+            function toggleNotes() {
+                notesOpen = !notesOpen;
+                notesPanel.classList.toggle("open", notesOpen);
+                if (notesOpen)
+                    notesText.textContent = slides[current].dataset.notes || "";
+            }
 
-  function toggleNotes() {
-    notesOpen = !notesOpen;
-    notesPanel.classList.toggle('open', notesOpen);
-    if (notesOpen) notesText.textContent = slides[current].dataset.notes || '';
-  }
+            function toggleTimer() {
+                if (!timerRunning) {
+                    timerStart = Date.now();
+                    timerInterval = setInterval(() => {
+                        const s = Math.floor((Date.now() - timerStart) / 1000);
+                        const m = Math.floor(s / 60);
+                        const sec = s % 60;
+                        timerEl.textContent = `${m}:${sec.toString().padStart(2, "0")}`;
+                        timerEl.classList.remove("warning", "over");
+                        if (s >= 480) timerEl.classList.add("over");
+                        else if (s >= 420) timerEl.classList.add("warning");
+                    }, 500);
+                    timerRunning = true;
+                } else {
+                    clearInterval(timerInterval);
+                    timerRunning = false;
+                }
+            }
 
-  function toggleTimer() {
-    if (!timerRunning) {
-      timerStart = Date.now();
-      timerInterval = setInterval(() => {
-        const s = Math.floor((Date.now() - timerStart) / 1000);
-        const m = Math.floor(s / 60);
-        const sec = s % 60;
-        timerEl.textContent = `${m}:${sec.toString().padStart(2,'0')}`;
-        timerEl.classList.remove('warning','over');
-        if (s >= 480) timerEl.classList.add('over');
-        else if (s >= 420) timerEl.classList.add('warning');
-      }, 500);
-      timerRunning = true;
-    } else {
-      clearInterval(timerInterval);
-      timerRunning = false;
-    }
-  }
+            // Keyboard
+            document.addEventListener("keydown", (e) => {
+                switch (e.key) {
+                    case "ArrowRight":
+                    case "ArrowDown":
+                    case " ":
+                        e.preventDefault();
+                        advance();
+                        break;
+                    case "ArrowLeft":
+                    case "ArrowUp":
+                        e.preventDefault();
+                        retreat();
+                        break;
+                    case "n":
+                    case "N":
+                        toggleNotes();
+                        break;
+                    case "t":
+                    case "T":
+                        toggleTimer();
+                        break;
+                    case "f":
+                    case "F":
+                        !document.fullscreenElement
+                            ? document.documentElement.requestFullscreen()
+                            : document.exitFullscreen();
+                        break;
+                }
+            });
 
-  // Keyboard
-  document.addEventListener('keydown', e => {
-    switch(e.key) {
-      case 'ArrowRight': case 'ArrowDown': case ' ':
-        e.preventDefault(); advance(); break;
-      case 'ArrowLeft': case 'ArrowUp':
-        e.preventDefault(); retreat(); break;
-      case 'n': case 'N': toggleNotes(); break;
-      case 't': case 'T': toggleTimer(); break;
-      case 'f': case 'F':
-        !document.fullscreenElement
-          ? document.documentElement.requestFullscreen()
-          : document.exitFullscreen();
-        break;
-    }
-  });
+            // Click deck to advance
+            document.getElementById("deck").addEventListener("click", advance);
 
-  // Click deck to advance
-  document.getElementById('deck').addEventListener('click', advance);
-
-  // Init
-  updateUI();
-</script>
-</body>
+            // Init
+            updateUI();
+        </script>
+    </body>
 </html>
